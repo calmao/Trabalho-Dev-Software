@@ -17,7 +17,7 @@ Definição do Formato Intermediário:
 	Classe Nota:
 		- Frequencia (nota e oitava)
 		- BPM (floats)
-		- Volume (floats)
+		- Volume (int entre 0 e 127)
 		- Instrumento (int)
 
 
