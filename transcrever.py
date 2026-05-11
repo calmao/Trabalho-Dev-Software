@@ -69,20 +69,18 @@ def transcrever(nome_arquivo, bpm, inst): # (str, list[float], list[int], list[i
                     if vol[i] > 127:
                         vol[i] = 127
                 case _:
-                    if ord(l[j]) < 64 & ord(l[j]) > 73:
+                    if (ord(l[j]) > 64 and ord(l[j]) < 73):
                         voz.append(Nota(f"{l[j]}{oitava[i]}", bpm[i], vol[i], inst[i]))
                         ultimo_char_nota = True
-                    elif ord(l[j]) < 96 & ord(l[j]) > 105:
-                        voz.append(Nota("-", bpm[i], vol[i], inst[i]))
+                    elif (ord(l[j]) > 96 and ord(l[j]) < 105):
+                        if(l[j] != "b" or l[j-1] != "M"):
+                            voz.append(Nota("-", bpm[i], vol[i], inst[i]))
                     elif l[j] == "M":
-                        voz.append(Nota("M", bpm[i], vol[i], inst[i]))
-                        j+=1
+                        voz.append(Nota("M"+str(oitava[i]), bpm[i], vol[i], inst[i]))
                     elif ultimo_char_nota:
                         voz.append(voz[-1])
                     
         partitura.append(voz)
-
-
 
     arq.close()
     return partitura

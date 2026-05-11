@@ -8,7 +8,10 @@ def main():
 
     p = transcrever.transcrever(sys.argv[1], bpm, inst)
 
-    print(p)
+    for i in p:
+        for j in i:
+            print(j, end="")
+        print("")
 
     return
 main()
