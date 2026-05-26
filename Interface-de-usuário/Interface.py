@@ -1,10 +1,11 @@
 import pygame, sys
 import os
+import transcrever
 
 # Adicionar o diretório pai ao path para importar transcrever
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import transcrever
+
 
 pygame.init()
 
