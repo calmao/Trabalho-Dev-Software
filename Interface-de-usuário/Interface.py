@@ -1,4 +1,10 @@
 import pygame, sys
+import os
+
+# Adicionar o diretório pai ao path para importar transcrever
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import transcrever
 
 pygame.init()
 
@@ -12,7 +18,9 @@ archive_img = pygame.image.load(r'Interface-de-usuário\arquivo.png').convert_al
 type_img = pygame.image.load(r'Interface-de-usuário\digitar.png').convert_alpha()
 
 user_text = ''
-typing_active = False
+archive_path = ''
+typing_active_arq = False
+typing_active_dig = False
 
 class Button():
     def __init__(self, x, y, image, scale):
@@ -22,8 +30,12 @@ class Button():
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.clicked = False
+        self.visible = True
     
     def draw(self):
+        if not self.visible:
+            return False
+
         action = False
 
         # obter posição do cursor
@@ -49,24 +61,68 @@ arquivo_botao = Button(100, 450, archive_img, 0.5)
 
 while True:
     screen.fill((202, 228, 241))
-    if digitar_botao.draw():
-        typing_active = not typing_active
+    if not typing_active_arq and not typing_active_dig:
+        if digitar_botao.draw():
+            typing_active_dig  = True
+            digitar_botao.visible = False
 
-    # renderizar texto (mostra sempre)
-    text_surface = base_font.render(user_text, True, (0, 0, 0))
-    screen.blit(text_surface, (400, 400))
-    if arquivo_botao.draw():
-        print('arquivo')
+        if arquivo_botao.draw():
+            typing_active_arq = True
+            arquivo_botao.visible = False
+            
+    else:
+        text_surface = base_font.render(user_text, True, (0, 0, 0))
+        screen.blit(text_surface, (100, 100))
 
+        info_surface = base_font.render('ESC para sair', True, (50, 50, 50))
+        screen.blit(info_surface, (100, 140))
+    if typing_active_arq:
+            path_surface = base_font.render(archive_path, True, (0, 0, 0))
+            screen.blit(path_surface, (100, 100))
+    
+            info_surface = base_font.render('ESC para sair', True, (50, 50, 50))
+            screen.blit(info_surface, (100, 140))
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == pygame.KEYDOWN and typing_active:
-            if event.key == pygame.K_BACKSPACE:
-                user_text = user_text[:-1]
-            else:
-                user_text += event.unicode
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE and typing_active_dig:
+                typing_active = False
+                digitar_botao.visible = True
+                arquivo_botao.visible = True
+            elif typing_active_dig:
+                if event.key == pygame.K_BACKSPACE:
+                    user_text = user_text[:-1]
+                else:
+                    user_text += event.unicode
+
+                arquivo = open('arquivo.txt', 'w')
+                arquivo.write(user_text)
+                arquivo.close()
+
+                if event.key == pygame.K_RETURN:
+                    transcrever.transcrever('arquivo.txt')
+
+
+
+            if event.key == pygame.K_ESCAPE and typing_active_arq:
+                typing_active_arq = False
+                digitar_botao.visible = True
+                arquivo_botao.visible = True
+            elif typing_active_arq:
+                if event.key == pygame.K_BACKSPACE:
+                    archive_path = archive_path[:-1]
+                elif event.key == pygame.K_RETURN:
+                    arquivo = open(archive_path, 'r')
+                    content = arquivo.read()
+                    content_surface = base_font.render(content, True, (0, 0, 0))
+                    screen.fill((202, 228, 241))
+                    screen.blit(content_surface, (100, 100))
+                    arquivo.close()
+                else:
+                    archive_path += event.unicode
     
 
 
