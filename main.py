@@ -4,7 +4,7 @@ import sys
     
 def main():
     inst = [100, 115, 15]
-    bpm = [100, 100, 100]
+    bpm = 100
 
     p = musica.transcrever(sys.argv[1], bpm, inst)
 

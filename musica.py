@@ -1,3 +1,5 @@
+import mido
+
 class Nota:
     def __init__(self, freq, bpm, vol, inst):
         self.freq = freq
@@ -12,19 +14,45 @@ class Interpretador:
     def __init__(self):
         self.partitura = []
 
-    def transcrever(self, nome_arquivo, bpm, inst): # (str, list[float], list[int], list[int], list[int])
-
-        vol = []
-        oitava = []
+    def transcrever(self, nome_arquivo, bpm, inst, vol, oitava): # (str, list[float], list[int], list[int], list[int])
+        if (bpm == -1):
+            bpm = 100
 
         arq = open(nome_arquivo)
+        for i in range(len(inst)):
+            match(i%4):
+                case 0:
+                    if(inst[i] == -1):
+                        inst[i] = 0
+                    if(vol[i] ==-1):
+                        vol[i] = 100
+                    if(oitava[i] == -1):
+                        oitava[i] = 6
+                case 1:
+                    if(inst[i] == -1):
+                        inst[i] = 20
+                    if(vol[i] ==-1):
+                        vol[i] = 80
+                    if(oitava[i] == -1):
+                        oitava[i] = 5
+                case 2:
+                    if(inst[i] == -1):
+                        inst[i] = 6
+                    if(vol[i] ==-1):
+                        vol[i] = 60
+                    if(oitava[i] == -1):
+                        oitava[i] = 4
+                case 3:
+                    if(inst[i] == -1):
+                        inst[i] = 71
+                    if(vol[i] ==-1):
+                        vol[i] = 40
+                    if(oitava[i] == -1):
+                        oitava[i] = 5
         
         for i in range(len(inst)):
-            oitava_ini = 6-(i%7)
             ultimo_char_nota = False #verdadeiro se, e somente se o ultimo caracter lido for uma nota
-            
-            oitava.append(oitava_ini)
-            vol.append(100 - (20*i))
+            oitava_ini = oitava[i]
 
             voz = []
             l = arq.readline()
@@ -33,7 +61,7 @@ class Interpretador:
             if l[0] == "[":
                 a = int(l[1:l.rfind("]")])
                 for i in range(a):
-                    voz.append(Nota("-", bpm[i], vol[i], inst[i]))
+                    voz.append(Nota("-", bpm, vol[i], inst[i]))
             
             for j in range(a, len(l)):
                 ultimo_char_nota = False
@@ -64,22 +92,22 @@ class Interpretador:
                         if oitava[i] == 0:
                             oitava[i]= oitava_ini
                     case ">":
-                        bpm[i] += 10
+                        bpm += 10
                     case "<":
-                        bpm[i] -= 10
+                        bpm -= 10
                     case " ":
                         vol[i] = 2*vol[i]
                         if vol[i] > 127:
                             vol[i] = 127
                     case _:
                         if (ord(l[j]) > 64 and ord(l[j]) < 73):
-                            voz.append(Nota(f"{l[j]}{oitava[i]}", bpm[i], vol[i], inst[i]))
+                            voz.append(Nota(f"{l[j]}{oitava[i]}", bpm, vol[i], inst[i]))
                             ultimo_char_nota = True
                         elif (ord(l[j]) > 96 and ord(l[j]) < 105):
                             if(l[j] != "b" or l[j-1] != "M"):
-                                voz.append(Nota("-", bpm[i], vol[i], inst[i]))
+                                voz.append(Nota("-", bpm, vol[i], inst[i]))
                         elif l[j] == "M":
-                            voz.append(Nota("M"+str(oitava[i]), bpm[i], vol[i], inst[i]))
+                            voz.append(Nota("M"+str(oitava[i]), bpm, vol[i], inst[i]))
                         elif ultimo_char_nota:
                             voz.append(voz[-1])
                         
@@ -90,3 +118,5 @@ class Interpretador:
 class Musica:
     def __init__(self):
         self.estado = "Parado"
+        self.posicao = -1
+        self.menssagens = []
