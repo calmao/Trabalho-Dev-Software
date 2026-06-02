@@ -1,7 +1,7 @@
 import mido
 
 class Nota:
-    def __init__(self, freq, bpm, vol, inst):
+    def __init__(self, freq:str, bpm, vol:int, inst:int):
         self.freq = freq
         self.bpm = bpm
         self.vol = vol
@@ -13,6 +13,14 @@ class Nota:
 class Interpretador:
     def __init__(self):
         self.partitura = []
+    
+    def __str__(self):
+        s = ''
+        for i in self.partitura:
+            for j in i:
+                s += j.freq
+            s += '\n'
+        return str(s)
 
     def transcrever(self, nome_arquivo, bpm, inst, vol, oitava): # (str, list[float], list[int], list[int], list[int])
         if (bpm == -1):
@@ -51,7 +59,7 @@ class Interpretador:
                         oitava[i] = 5
         
         for i in range(len(inst)):
-            ultimo_char_nota = False #verdadeiro se, e somente se o ultimo caracter lido for uma nota
+            ultimo_char_nota = False #verdadeiro se, e somente se, o ultimo caracter lido for uma nota
             oitava_ini = oitava[i]
 
             voz = []
@@ -89,7 +97,7 @@ class Interpretador:
                             oitava[i]= oitava_ini
                     case "V":
                         oitava[i] -= 1
-                        if oitava[i] == 0:
+                        if oitava[i] == -2:
                             oitava[i]= oitava_ini
                     case ">":
                         bpm += 10
@@ -119,4 +127,39 @@ class Musica:
     def __init__(self):
         self.estado = "Parado"
         self.posicao = -1
-        self.menssagens = []
+
+    def iniciar(self, trancricao:Interpretador):
+        mido.set_backend('mido.backend.rtmidi')
+        tempo = 0
+        self.mid = mido.MidiFile(type=1)
+        for voz in trancricao.partitura:
+            track = mido.MidiTrack()
+            for c in voz:
+                if (c.freq == '-'):
+                    tempo += 60/c.bpm
+                else:
+                    match(c.freq[0]):
+                        case 'C':
+                            nota = (int(c.freq[1]) + 1)
+                        case 'D':
+                            nota = (int(c.freq[1]) + 1) + 2
+                        case 'M':
+                            nota = (int(c.freq[1]) + 1) + 3
+                        case 'E':
+                            nota = (int(c.freq[1]) + 1) + 4
+                        case 'F':
+                            nota = (int(c.freq[1]) + 1) + 5
+                        case 'G':
+                            nota = (int(c.freq[1]) + 1) + 7
+                        case 'A':
+                            nota = (int(c.freq[1]) + 1) + 9
+                        case 'H':
+                            nota = (int(c.freq[1]) + 1) + 10
+                        case 'B':
+                            nota = (int(c.freq[1]) + 1) + 11
+                    track.append(mido.Message('note_on', note=nota, velocity=c.vol, time=tempo))
+                    track.append(mido.Message('note_off', note=nota, velocity=c.vol, time=60/c.bpm))
+                    tempo = 0
+    
+    def play(self):
+        
