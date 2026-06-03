@@ -128,8 +128,12 @@ class Musica:
         self.estado = "Parado"
         self.posicao = -1
 
+    def __str__(self):
+        return str(self.mid[0])
+
     def iniciar(self, trancricao:Interpretador):
-        mido.set_backend('mido.backend.rtmidi')
+        mido.set_backend('mido.backends.rtmidi')
+        self.port = mido.open_output(mido.get_output_names()[0])
         tempo = 0
         self.mid = mido.MidiFile(type=1)
         for voz in trancricao.partitura:
@@ -138,28 +142,33 @@ class Musica:
                 if (c.freq == '-'):
                     tempo += 60/c.bpm
                 else:
+                    nota = (int(c.freq[1]) + 1)*12
                     match(c.freq[0]):
                         case 'C':
-                            nota = (int(c.freq[1]) + 1)
+                            nota += 0
                         case 'D':
-                            nota = (int(c.freq[1]) + 1) + 2
+                            nota += 2
                         case 'M':
-                            nota = (int(c.freq[1]) + 1) + 3
+                            nota += 3
                         case 'E':
-                            nota = (int(c.freq[1]) + 1) + 4
+                            nota += 4
                         case 'F':
-                            nota = (int(c.freq[1]) + 1) + 5
+                            nota += 5
                         case 'G':
-                            nota = (int(c.freq[1]) + 1) + 7
+                            nota += 7
                         case 'A':
-                            nota = (int(c.freq[1]) + 1) + 9
+                            nota += 9
                         case 'H':
-                            nota = (int(c.freq[1]) + 1) + 10
+                            nota += 10
                         case 'B':
-                            nota = (int(c.freq[1]) + 1) + 11
+                            nota += 11
                     track.append(mido.Message('note_on', note=nota, velocity=c.vol, time=tempo))
                     track.append(mido.Message('note_off', note=nota, velocity=c.vol, time=60/c.bpm))
                     tempo = 0
     
-    def play(self):
-        
+    def tocar(self):
+        self.estado = 'tocando'
+        while (self.estado == 'tocando'):
+            for msg in self.mid.play():
+                self.port.send(msg)
+
