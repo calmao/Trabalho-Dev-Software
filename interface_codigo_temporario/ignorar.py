@@ -1,45 +1,42 @@
 
 import tkinter as tk
 
-def butonado():
-    master.destroy()
+def carregar_txt():
+    nomeDoArquivo = str(f"input_files/{ inTxtNome.get()}")
+    if(nomeDoArquivo):
+        arquivo = open(nomeDoArquivo)
+        textoDoArquivo = arquivo.read()
+        arquivo.close()
 
-def show_input():
-    lbl.config(text=f"Input: {txt.get('1.0', 'end-1c')}")
+        textoInput.delete(1.0,tk.END)
+        textoInput.insert(1.0,textoDoArquivo)
+    
 
+tela_interface = tk.Tk()
+tela_interface.title("INTERFACE")
+tela_interface.geometry("900x550")
+tela_interface.configure(bg="white")
+tela_interface.columnconfigure(0,weight=1)
+tela_interface.rowconfigure(0,weight=1)
+tela_interface.columnconfigure(1,weight=2)
 
-master = tk.Tk()
-master.geometry("1100x700")
-master.title("INTERFACE EXPERIMENTAL")
-master.configure(bg ="white")
+textoInput = tk.Text(tela_interface)
+textoInput.grid(row=0,column=0,sticky="nsew")
 
-botaoFechar = tk.Button(master, 
-                   text="Fechar", 
-                   command=butonado,
-                   anchor="center",
-                   font=("Arial", 16),
-                   highlightbackground="lightblue",
-                   highlightthickness=2,
-                   justify="center",
-                   height=1,
-                   width=7,)
-botaoFechar.grid(row =0,column =0,sticky = "w")
+frame = tk.Frame(tela_interface,bg = "lightblue")
+frame.grid(row = 0,column = 1,sticky="nsew")
+frame.columnconfigure(0,weight=1)
+frame.rowconfigure(0,weight=0)
+frame.rowconfigure(1,weight=0)
+frame.rowconfigure(2,weight=1)
 
-btn = tk.Button(master, text="Print", command=show_input,
-                anchor="center",
-                font=("Arial", 16),
-                highlightbackground="lightblue",
-                highlightthickness=2,
-                justify="center",
-                height=1,
-                width=7,)
-btn.grid(row =1,column =0,sticky = "w")
+inTxtLbl = tk.Label(frame,text = "insira o nome do arquivo <nome.txt>")
+inTxtLbl.grid(row=0,column=0,sticky="w")
 
-txt = tk.Text(master, height=20, width=70,highlightbackground="lightblue")
-txt.grid(row =3,column = 0)
+inTxtNome = tk.Entry(frame)
+inTxtNome.grid(row=1,column=0,sticky="ew")
 
-lbl = tk.Label(master, text="aperte print para replicar a entrada :)")
-lbl.grid(row =4,column =0,sticky = "w")
+inTxtConfirm = tk.Button(frame,text="carregar",command=carregar_txt)
+inTxtConfirm.grid(row=2,column=0,sticky="nw")
 
-master.mainloop()
-
+tela_interface.mainloop()
