@@ -10,30 +10,36 @@ def show_input():
 
 master = tk.Tk()
 master.geometry("1100x700")
-#master.configure(bg ="black")
+master.title("INTERFACE EXPERIMENTAL")
+master.configure(bg ="white")
 
 botaoFechar = tk.Button(master, 
-                   text="fechar", 
+                   text="Fechar", 
                    command=butonado,
                    anchor="center",
                    font=("Arial", 16),
-                   height=1,
-                   highlightbackground="black",
+                   highlightbackground="lightblue",
                    highlightthickness=2,
                    justify="center",
-                   overrelief="raised",
-                   width=15,
-                   wraplength=100)
-botaoFechar.pack()
+                   height=1,
+                   width=7,)
+botaoFechar.grid(row =0,column =0,sticky = "w")
 
-btn = tk.Button(master, text="Print", command=show_input)
-btn.pack()
+btn = tk.Button(master, text="Print", command=show_input,
+                anchor="center",
+                font=("Arial", 16),
+                highlightbackground="lightblue",
+                highlightthickness=2,
+                justify="center",
+                height=1,
+                width=7,)
+btn.grid(row =1,column =0,sticky = "w")
 
-txt = tk.Text(master, height=5, width=40)
-txt.pack()
+txt = tk.Text(master, height=20, width=70,highlightbackground="lightblue")
+txt.grid(row =3,column = 0)
 
-lbl = tk.Label(master, text="")
-lbl.pack()
+lbl = tk.Label(master, text="aperte print para replicar a entrada :)")
+lbl.grid(row =4,column =0,sticky = "w")
 
 master.mainloop()
 
