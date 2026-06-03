@@ -10,6 +10,15 @@ def carregar_txt():
 
         textoInput.delete(1.0,tk.END)
         textoInput.insert(1.0,textoDoArquivo)
+
+def salvar_txt():
+    txtParaSalvar = textoInput.get('1.0', 'end-1c')
+    nomeDoArquivo = str(f"input_files/{ inTxtNome.get()}")
+    if(txtParaSalvar):
+        arquivo = open(nomeDoArquivo,"w")
+        arquivo.write(str(txtParaSalvar))
+        arquivo.close()
+
     
 
 tela_interface = tk.Tk()
@@ -26,9 +35,6 @@ textoInput.grid(row=0,column=0,sticky="nsew")
 frame = tk.Frame(tela_interface,bg = "lightblue")
 frame.grid(row = 0,column = 1,sticky="nsew")
 frame.columnconfigure(0,weight=1)
-frame.rowconfigure(0,weight=0)
-frame.rowconfigure(1,weight=0)
-frame.rowconfigure(2,weight=1)
 
 inTxtLbl = tk.Label(frame,text = "insira o nome do arquivo <nome.txt>")
 inTxtLbl.grid(row=0,column=0,sticky="w")
@@ -38,5 +44,8 @@ inTxtNome.grid(row=1,column=0,sticky="ew")
 
 inTxtConfirm = tk.Button(frame,text="carregar",command=carregar_txt)
 inTxtConfirm.grid(row=2,column=0,sticky="nw")
+
+inTxtSave = tk.Button(frame,text="salvar",command=salvar_txt)
+inTxtSave.grid(row=3,column=0,sticky="nw")
 
 tela_interface.mainloop()
