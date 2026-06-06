@@ -1,4 +1,5 @@
 import mido
+import time
 
 class Nota:
     def __init__(self, freq:str, bpm, vol:int, inst:int):
@@ -129,18 +130,18 @@ class Musica:
         self.posicao = -1
 
     def __str__(self):
-        return str(self.mid[0])
+        return str(self.mid.tracks[0])
 
     def iniciar(self, trancricao:Interpretador):
+        cons_t = 14400
         mido.set_backend('mido.backends.rtmidi')
-        self.port = mido.open_output(mido.get_output_names()[0])
         tempo = 0
         self.mid = mido.MidiFile(type=1)
         for voz in trancricao.partitura:
             track = mido.MidiTrack()
             for c in voz:
                 if (c.freq == '-'):
-                    tempo += 60/c.bpm
+                    tempo += cons_t/c.bpm
                 else:
                     nota = (int(c.freq[1]) + 1)*12
                     match(c.freq[0]):
@@ -163,12 +164,18 @@ class Musica:
                         case 'B':
                             nota += 11
                     track.append(mido.Message('note_on', note=nota, velocity=c.vol, time=tempo))
-                    track.append(mido.Message('note_off', note=nota, velocity=c.vol, time=60/c.bpm))
+                    track.append(mido.Message('note_off', note=nota, velocity=c.vol, time=cons_t/c.bpm))
                     tempo = 0
+            self.mid.tracks.append(track)
     
     def tocar(self):
-        self.estado = 'tocando'
-        while (self.estado == 'tocando'):
+        with mido.open_output(mido.get_output_names()[0]) as self.port:
+            self.estado = 'tocando'
+            time.sleep(0.5)
             for msg in self.mid.play():
+                if(self.estado != 'tocando'):
+                    break
                 self.port.send(msg)
+            time.sleep(0.5)
+            
 

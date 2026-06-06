@@ -4,10 +4,10 @@ import mido
 
     
 def main():
-    vol = [100]
-    oitava = [3]
-    inst = [0]
-    bpm = 100
+    vol = [100, 100]
+    oitava = [4, 3]
+    inst = [0, 0]
+    bpm = 60
 
     
     p = musica.Interpretador()
@@ -17,7 +17,8 @@ def main():
 
     m = musica.Musica()
     m.iniciar(p)
-    print(m)
+    print(m.mid.length)
+    #print(m.mid.tracks)
     #m.tocar()
 
     return
