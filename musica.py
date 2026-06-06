@@ -19,13 +19,17 @@ class Musica:
         mido.set_backend('mido.backends.rtmidi')
         tempo = 0
         self.mid = MidiFile(type=1)
-        for voz in trancricao.partitura:
+        for i, voz in enumerate(trancricao.partitura):
             track = MidiTrack()
-            track.append(Message('program_change', program=12, time=0))
+            track.append(Message('program_change', channel=i, program=voz[0].inst, time=0))
+            inst_anterior = voz[0].inst
             for c in voz:
                 if (c.freq == '-'):
                     tempo += cons_t/c.bpm
                 else:
+                    if(inst_anterior != c.inst):
+                        inst_anterior = c.inst
+                        track.append(Message('program_change', channel=i, program=c.inst, time=0))
                     nota = (int(c.freq[1]) + 1)*12
                     match(c.freq[0]):
                         case 'C':
@@ -46,8 +50,8 @@ class Musica:
                             nota += 10
                         case 'B':
                             nota += 11
-                    track.append(Message('note_on', note=nota, velocity=c.vol, time=int(tempo)))
-                    track.append(Message('note_off', note=nota, velocity=c.vol, time=int(cons_t/c.bpm)))
+                    track.append(Message('note_on', channel=i, note=nota, velocity=c.vol, time=int(tempo)))
+                    track.append(Message('note_off', channel=i, note=nota, velocity=c.vol, time=int(cons_t/c.bpm)))
                     tempo = 0
             self.mid.tracks.append(track)
     
