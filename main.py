@@ -1,6 +1,8 @@
-import musica
+from musica import Musica
+from interpretador import Interpretador
 import sys
 import mido
+import time
 
     
 def main():
@@ -10,16 +12,18 @@ def main():
     bpm = 60
 
     
-    p = musica.Interpretador()
+    p = Interpretador()
     p.transcrever(sys.argv[1], bpm, inst, vol, oitava)
     
     #print(mido.get_output_names()[0])
 
-    m = musica.Musica()
+    m = Musica()
     m.iniciar(p)
     print(m.mid.length)
     #print(m.mid.tracks)
-    #m.tocar()
+    m.tocar()
+    m.tocar()
+    #m.salvar('doremifa.mid')
 
     return
 main()
