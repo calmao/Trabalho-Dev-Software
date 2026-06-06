@@ -3,15 +3,17 @@
 ## Boas práticas
 	- Variaveis em snake_case
 
-## Como usar os Módulos Música e Trancrição
-	p = trancrever("nome_do_arquivo.txt", bpm, instrumento) - implementado
-	//retorna a partitura p após recebe o arquivo txt e as listas de bpm e instrumentos iniciais de cada voz
+## Como usar os Módulos Música e Interpretador
+	p.trancrever("nome_do_arquivo.txt", bpm, instrumento) - implementado
+	//vai transcrever as informações da arquivo para a partitura
 
-	tocar(p) - não implementado
-	//toca a partitura p
+	m.iniciar(p) - implementado
+	//vai transformar as informações contidas no interpretador p em mensagens MIDI
+	m.tocar()
+	//toca a musica
 
-	salvar(p) - não implementado
-	//salva o arquivo MIDI de p
+	m.salvar() - implementado
+	//salva a musica em um arquivo MIDI
 
 ## Módulos
 
