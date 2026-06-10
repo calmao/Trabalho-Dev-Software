@@ -22,8 +22,7 @@ def main():
     print(m.mid.length)
     #print(m.mid.tracks)
     m.tocar()
-    m.tocar()
-    #m.salvar('doremifa.mid')
+    m.salvar('doremifa.mid')
 
     return
 main()

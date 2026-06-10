@@ -10,7 +10,7 @@ class InterfaceGrafica(tk.Tk):
         # saidas relevantes para a main
         self.saidaMIDI = musica.Musica()
         self.bpm = 100
-        self.volume = 30
+        self.listaDeVolumes = [100 for i in range (16)]
         self.listaDeInstrumentos = [int(-1) for i in range(16)]
 
         #
@@ -24,73 +24,48 @@ class InterfaceGrafica(tk.Tk):
         self.rowconfigure(1, weight=10)
         self.vcmd = self.register(self.input_e_numero)
 
-        self.volumeFrame = tk.Frame(self)
-        self.volumeFrame.grid(row=1,column=1,sticky ="sw")
         self.instrumentosFrame = tk.Frame(self)
-        self.instrumentosFrame.grid(row = 8,column = 1,sticky = "w")
+        self.instrumentosFrame.grid(row = 8,column = 1,pady = 20,sticky = "w")
         self.controlesFrame = tk.Frame(self)
-        self.controlesFrame.grid(row=9,column=1)
+        self.controlesFrame.grid(row=10,column=1)
 
         self.label_file_explorer = tk.Label(self, text="No file selected", bg="white")
-        self.label_file_explorer.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        self.label_file_explorer.grid(row=0, column=0,columnspan=2, padx=10, pady=5, sticky="w")
 
         self.button_arq = tk.Button(
-            self.volumeFrame,
+            self,
             text="Importar Arquivo",
             bg="lightgray",
             activebackground="gray",
             cursor="hand2",
             command=self.browseFiles
         )
-        self.button_arq.grid(row=0, column=0, sticky='se')
+        self.button_arq.grid(row=1, column=1, sticky='sw',pady = 20)
 
         self.inputtxt = tk.Text(self, height = 10, width = 25, bg = "light yellow")
         self.inputtxt.grid(row=1, column=0, rowspan=10, sticky='nsew', padx=10, pady=10)
 
-        slider_label = tk.Label(
-            self.volumeFrame, 
-            text='Volume:'
-        )
-        slider_label.grid(
-            column=0,
-            row=1,
-            sticky='w'
-        )
-
-        slider = tk.Scale(
-            self.volumeFrame,
-            from_=0,
-            to=127,
-            orient='horizontal', 
-            variable=self.volume
-        )
-        slider.grid(
-            column=0,
-            columnspan =2,
-            row=2,
-            sticky='we'
-        )
-
-        self.bpmLabel = tk.Label(self,text = "bpm inicial : 100")
+        self.bpmLabel = tk.Label(self,text = "BPM inicial : 100")
         self.bpmLabel.grid(row=4,column=1,sticky="w")
 
         self.barrinhaBpm = tk.Entry(self,validate = "key", validatecommand=(self.vcmd, '%P'),width = 10)
         self.barrinhaBpm.grid(row=5,column=1,sticky = "ew")
 
-        self.botaoBpm = tk.Button(self,text = "confirmar Bpm",command = self.muda_bpm_inicial)
+        self.botaoBpm = tk.Button(self,text = "confirmar BPM",command = self.muda_bpm_inicial)
         self.botaoBpm.grid(row=6,column=1,sticky = "w")
 
+#codigo duplicado para gerar lista
+###############################
         self.instruIndice = 0
 
-        self.instrumentosLbl = tk.Label(self,text = "Selecione intrumentos iniciais [linha][instrumento MIDI]")
-        self.instrumentosLbl.grid(row = 7,column =1,sticky = "w")
+        self.instrumentosLbl = tk.Label(self.instrumentosFrame,text = "Selecione intrumentos iniciais [linha][instrumento MIDI]")
+        self.instrumentosLbl.pack(side = "top")
 
         self.instruSetaEsq = tk.Button(self.instrumentosFrame,text = "<",command = self.diminui_instuIndice)
         self.instruSetaEsq.pack(side = "left")
 
-        self.instruIndiceIn = tk.Entry(self.instrumentosFrame,width =3,validate = "key", validatecommand=(self.vcmd, '%P'))
+        self.instruIndiceIn = tk.Label(self.instrumentosFrame,text = "1")
         self.instruIndiceIn.pack(side = "left")
-        self.instruIndiceIn.insert(0,1)
 
         self.instruSetaDir = tk.Button(self.instrumentosFrame,text = ">",command = self.aumenta_instruIndice)
         self.instruSetaDir.pack(side = "left")
@@ -99,10 +74,12 @@ class InterfaceGrafica(tk.Tk):
         self.instruTipo.pack(side = "left")
         self.instruTipo.insert(0,'')
 
-        self.instrumentoConfirma = tk.Button(self.instrumentosFrame,text = "confirma",command = self.confirmar_instrumento)
+        self.instrumentoConfirma = tk.Button(self.instrumentosFrame,text = "Confirma",command = self.confirmar_instrumento)
         self.instrumentoConfirma.pack(side ="left")
+#####################
 
-        self.confirmarEntradas = tk.Button(self.controlesFrame,text ="ler Entrada",command = self.chama_confirmar_entradas)
+#comandos finais do usuario
+        self.confirmarEntradas = tk.Button(self.controlesFrame,text ="Ler Entrada",command = self.chama_confirmar_entradas)
         self.confirmarEntradas.pack(side = "left")
 
         self.botaoTocar = tk.Button(self.controlesFrame,text = "Tocar",command = self.chama_tocar)
@@ -115,8 +92,33 @@ class InterfaceGrafica(tk.Tk):
         self.botaoGerarMIDI.pack(side = "left")
 
         self.mensagemControles = tk.Label(self,text = "Em aguardo")
-        self.mensagemControles.grid(row=10,column =1)
+        self.mensagemControles.grid(row=11,column =1)
 
+#codigo duplicado pode ser transformado em classe
+#####################
+        self.listaVolumesFrame = tk.Frame(self)
+        self.listaVolumesFrame.grid(row =9,column = 1, pady = 20,sticky = "w")
+
+        self.volumesIndice = 0
+
+        self.volumesLbl = tk.Label(self.listaVolumesFrame,text = "Selecionar volume de cada linha [linha][volume (1 a 127) ]")
+        self.volumesLbl.pack(side = "top")
+
+        self.listaVolumesSetaEsq = tk.Button(self.listaVolumesFrame,text = "<")
+        self.listaVolumesSetaEsq.pack(side = "left")
+
+        self.listaVolumesIn = tk.Label(self.listaVolumesFrame,text = "1")
+        self.listaVolumesIn.pack(side = "left")
+
+        self.listaVolumesSetaDir = tk.Button(self.listaVolumesFrame,text = ">")
+        self.listaVolumesSetaDir.pack(side = "left")
+
+        self.volumeDaLinha = tk.Entry(self.listaVolumesFrame,width =3,validate = "key", validatecommand=(self.vcmd, '%P'))
+        self.volumeDaLinha.pack(side="left")
+
+        self.volumeConfirma = tk.Button(self.listaVolumesFrame,text = "Confirma")
+        self.volumeConfirma.pack(side = "left")
+#####################
     
     def browseFiles(self):
         filename = filedialog.askopenfilename(initialdir = "/",
@@ -142,15 +144,14 @@ class InterfaceGrafica(tk.Tk):
         bpmtemp = int(self.barrinhaBpm.get())
         if bpmtemp > 0 and bpmtemp < 401:
             self.bpm = bpmtemp
-            self.bpmLabel.config(text = str(f"bpm inicial :{str(self.bpm)}"))
+            self.bpmLabel.config(text = str(f"BPM inicial :{str(self.bpm)}"))
         else:
-            self.bpmLabel.config(text = str(f"bpm inicial : erro, deve estar entre 0 e 400"))
+            self.bpmLabel.config(text = str(f"BPM inicial : erro, deve estar entre 0 e 400"))
     
     def diminui_instuIndice(self):
         if self.instruIndice > 0:
             self.instruIndice -= 1
-            self.instruIndiceIn.delete(0,"end")
-            self.instruIndiceIn.insert(0,str(self.instruIndice+1))
+            self.instruIndiceIn.configure(text = str(self.instruIndice+1))
             self.instruTipo.delete(0,"end")
             self.instruTipo.insert(0,str(self.listaDeInstrumentos[self.instruIndice]))
         else:
@@ -159,8 +160,7 @@ class InterfaceGrafica(tk.Tk):
     def aumenta_instruIndice(self):
         if  self.instruIndice < 15:
             self.instruIndice += 1
-            self.instruIndiceIn.delete(0,"end")
-            self.instruIndiceIn.insert(0,str(self.instruIndice+1))
+            self.instruIndiceIn.configure(text = str(self.instruIndice+1))
             self.instruTipo.delete(0,"end")
             self.instruTipo.insert(0,str(self.listaDeInstrumentos[self.instruIndice]))
         else:
@@ -170,23 +170,19 @@ class InterfaceGrafica(tk.Tk):
         self.listaDeInstrumentos[self.instruIndice] = int(self.instruTipo.get())
 
     def chama_confirmar_entradas(self):
-        self.mandarEntrada = True
-        self.saidaMIDI.iniciar()
+        #self.saidaMIDI.iniciar()
         self.mensagemControles.config(text = "Entrada de texto Recebida")
 
     def chama_tocar(self):
-        self.tocar = True
-        self.saidaMIDI.tocar()
+        #self.saidaMIDI.tocar()
         self.mensagemControles.config(text = "Gerando e tocando música")
 
     def chama_pausar(self):
-        self.pausar = True
-        self.saidaMIDI.parar()
+        #self.saidaMIDI.parar()
         self.mensagemControles.config(text = "Parando musica")
         
     def chama_gerarMIDI(self):
-        self.gerarMIDI = True
-        self.saidaMIDI.salvar()
+        #self.saidaMIDI.salvar()
         self.mensagemControles.config(text = "Gerando MIDI")
 
 interface = InterfaceGrafica()
