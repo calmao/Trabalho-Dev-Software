@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog  
 
 root = tk.Tk()
 root.title("Explorador de Arquivos")
@@ -20,18 +20,21 @@ def browseFiles():
 
 
 
-root.configure(bg="lightblue")
+root.configure(bg="white")
 
 # layout: duas colunas (0 = área principal, 1 = controles)
 root.columnconfigure(0, weight=10)
 root.columnconfigure(1, weight=0)
 root.rowconfigure(1, weight=10)
 
-label_file_explorer = tk.Label(root, text="No file selected", bg="lightblue")
+label_file_explorer = tk.Label(root, text="No file selected", bg="white")
 label_file_explorer.grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
+volumeFrame = tk.Frame(root)
+volumeFrame.grid(row=1,column=1,sticky ="sw")
+
 button_arq = tk.Button(
-    root,
+    volumeFrame,
     text="Importar Arquivo",
     bg="lightgray",
     activebackground="gray",
@@ -39,77 +42,40 @@ button_arq = tk.Button(
     command=browseFiles
 )
 # colocar controles na coluna da direita
-button_arq.grid(row=3, column=1, padx=20, pady=10, sticky='w')
+button_arq.grid(row=0, column=0, sticky='se')
 
 # slider current value
 current_value = tk.DoubleVar()
 
-
-def get_current_value():
-    return '{: .2f}'.format(current_value.get())
-
-
-def slider_changed(event):
-    value_label.configure(text=get_current_value())
-
 slider_label = tk.Label(
-    root, 
+    volumeFrame, 
     text='Volume:'
 )
 
 slider_label.grid(
     column=0,
-    row=0,
-    sticky='e'
+    row=1,
+    sticky='w'
 )
 
 #  slider
 slider = tk.Scale(
-    root,
+    volumeFrame,
     from_=0,
     to=127,
     orient='horizontal',  # vertical
-    command=slider_changed,
     variable=current_value
 )
 
 slider.grid(
-    column=1,
-    row=0,
+    column=0,
+    columnspan =2,
+    row=2,
     sticky='we'
 )
 
-current_value_label = tk.Label(
-    root,
-    text='Current Value Volume:'
-)
-
-current_value_label.grid(
-    row=1,
-    column =1,
-    columnspan=1,
-    sticky='ws',
-    ipadx=10,
-    ipady=10
-)
-
-value_label = tk.Label(
-    root,
-    text=get_current_value()
-)
-value_label.grid(
-    row=2,
-    column =1,
-    columnspan=2,
-    sticky='nw'
-)
-
-print(get_current_value())
-
 inputtxt = tk.Text(root, height = 10, width = 25, bg = "light yellow")
 inputtxt.grid(row=1, column=0, rowspan=10, sticky='nsew', padx=10, pady=10)
-
-
 
 #validar inputs
 def validar_input_numero(textoMandado):
@@ -126,11 +92,11 @@ vcmd = root.register(validar_input_numero)
 #
 def muda_bpm_inicial():
     bpmtemp = int(barrinhaBpm.get())
-    if bpmtemp%5 == 0 :
+    if bpmtemp > 0 and bpmtemp < 401:
         bpmInicial = bpmtemp
         bpmLabel.config(text = str(f"bpm inicial :{str(bpmInicial)}"))
     else:
-        bpmLabel.config(text = str(f"bpm inicial : erro, deve ser inteiro multiplo de 5"))
+        bpmLabel.config(text = str(f"bpm inicial : erro, deve estar entre 0 e 400"))
 
 
 bpmLabel = tk.Label(root,text = "bpm inicial : 100")
@@ -161,7 +127,7 @@ def diminui_instuIndice():
 def aumenta_instruIndice():
     global instruIndice
     global listaInstrumentos
-    if  instruIndice < 50:
+    if  instruIndice < 16:
         instruIndice += 1
         instruIndiceIn.delete(0,"end")
         instruIndiceIn.insert(0,str(instruIndice))
@@ -176,7 +142,7 @@ def confirmar_instrumento():
     listaInstrumentos[instruIndice] = int(instruTipo.get())
 
 
-listaInstrumentos = [int(-1) for i in range(1,51)]
+listaInstrumentos = [int(-1) for i in range(1,17)]
 instruIndice = 1
 
 instrumentosLbl = tk.Label(root,text = "selecionar intrumentos iniciais [linha][instrumento]")
@@ -201,5 +167,55 @@ instruTipo.insert(0,'')
 
 instrumentoConfirma = tk.Button(instrumentosFrame,text = "confirma",command = confirmar_instrumento)
 instrumentoConfirma.pack(side ="left")
+
+#botoes do usuario
+# mandar entrada, tocar, pausar, gerar arquivo
+mandarEntrada = False
+tocar = False
+pausar = False
+gerarMIDI = False
+
+def chama_confirmar_entradas():
+    global mandarEntrada
+    global mensagemControles
+    mandarEntrada = True
+    mensagemControles.config(text = "Entrada de texto Recebida")
+
+
+def chama_tocar():
+    global tocar
+    global mensagemControles
+    tocar = True
+    mensagemControles.config(text = "Gerando e tocando música")
+
+def chama_pausar():
+    global pausar
+    global mensagemControles
+    pausar = True
+    mensagemControles.config(text = "Pausado")
+    
+def chama_gerarMIDI():
+    global gerarMIDI
+    global mensagemControles
+    gerarMIDI = True
+    mensagemControles.config(text = "Gerando MIDI")
+
+controlesFrame = tk.Frame(root)
+controlesFrame.grid(row=9,column=1)
+
+confirmarEntradas = tk.Button(controlesFrame,text ="ler Entrada",command = chama_confirmar_entradas)
+confirmarEntradas.pack(side = "left")
+
+botaoTocar = tk.Button(controlesFrame,text = "Tocar",command = chama_tocar)
+botaoTocar.pack(side = "left")
+
+botaoPausar = tk.Button(controlesFrame,text = "Pausar",command = chama_pausar)
+botaoPausar.pack(side="left")
+
+botaoGerarMIDI = tk.Button(controlesFrame,text = "Gerar MIDI",command = chama_gerarMIDI)
+botaoGerarMIDI.pack(side = "left")
+
+mensagemControles = tk.Label(root,text = " ")
+mensagemControles.grid(row=10,column =1)
 
 root.mainloop()
