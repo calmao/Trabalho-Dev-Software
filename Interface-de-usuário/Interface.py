@@ -115,10 +115,10 @@ botaoBpm.grid(row=6,column=1,sticky = "w")
 def diminui_instuIndice():
     global instruIndice
     global listaInstrumentos
-    if instruIndice > 1:
+    if instruIndice > 0:
         instruIndice -= 1
         instruIndiceIn.delete(0,"end")
-        instruIndiceIn.insert(0,str(instruIndice))
+        instruIndiceIn.insert(0,str(instruIndice+1))
         instruTipo.delete(0,"end")
         instruTipo.insert(0,str(listaInstrumentos[instruIndice]))
     else:
@@ -127,10 +127,10 @@ def diminui_instuIndice():
 def aumenta_instruIndice():
     global instruIndice
     global listaInstrumentos
-    if  instruIndice < 16:
+    if  instruIndice < 15:
         instruIndice += 1
         instruIndiceIn.delete(0,"end")
-        instruIndiceIn.insert(0,str(instruIndice))
+        instruIndiceIn.insert(0,str(instruIndice+1))
         instruTipo.delete(0,"end")
         instruTipo.insert(0,str(listaInstrumentos[instruIndice]))
     else:
@@ -142,10 +142,10 @@ def confirmar_instrumento():
     listaInstrumentos[instruIndice] = int(instruTipo.get())
 
 
-listaInstrumentos = [int(-1) for i in range(1,17)]
-instruIndice = 1
+listaInstrumentos = [int(-1) for i in range(16)]
+instruIndice = 0
 
-instrumentosLbl = tk.Label(root,text = "selecionar intrumentos iniciais [linha][instrumento]")
+instrumentosLbl = tk.Label(root,text = "Selecione intrumentos iniciais [linha][instrumento MIDI]")
 instrumentosLbl.grid(row = 7,column =1,sticky = "w")
 
 instrumentosFrame = tk.Frame(root)
@@ -215,7 +215,7 @@ botaoPausar.pack(side="left")
 botaoGerarMIDI = tk.Button(controlesFrame,text = "Gerar MIDI",command = chama_gerarMIDI)
 botaoGerarMIDI.pack(side = "left")
 
-mensagemControles = tk.Label(root,text = " ")
+mensagemControles = tk.Label(root,text = "Em aguardo")
 mensagemControles.grid(row=10,column =1)
 
 root.mainloop()
