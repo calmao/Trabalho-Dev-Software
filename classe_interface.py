@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import filedialog  
+from tkinter import filedialog
+import musica  
 
 class InterfaceGrafica(tk.Tk):
     def __init__(self):
@@ -7,13 +8,10 @@ class InterfaceGrafica(tk.Tk):
         super().__init__()
 
         # saidas relevantes para a main
+        self.saidaMIDI = musica.Musica()
         self.bpm = 100
         self.volume = 30
         self.listaDeInstrumentos = [int(-1) for i in range(16)]
-        self.mandarEntrada = False
-        self.tocar = False
-        self.pausar = False
-        self.gerarMIDI = False
 
         #
         # widgets e configuracoes da tkinter
@@ -173,16 +171,23 @@ class InterfaceGrafica(tk.Tk):
 
     def chama_confirmar_entradas(self):
         self.mandarEntrada = True
+        self.saidaMIDI.iniciar()
         self.mensagemControles.config(text = "Entrada de texto Recebida")
 
     def chama_tocar(self):
         self.tocar = True
+        self.saidaMIDI.tocar()
         self.mensagemControles.config(text = "Gerando e tocando música")
 
     def chama_pausar(self):
         self.pausar = True
-        self.mensagemControles.config(text = "Pausado")
+        self.saidaMIDI.parar()
+        self.mensagemControles.config(text = "Parando musica")
         
     def chama_gerarMIDI(self):
         self.gerarMIDI = True
+        self.saidaMIDI.salvar()
         self.mensagemControles.config(text = "Gerando MIDI")
+
+interface = InterfaceGrafica()
+interface.mainloop()
