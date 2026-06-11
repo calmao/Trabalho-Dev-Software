@@ -8,7 +8,7 @@ import time
 def main():
     vol = [100, 100]
     oitava = [4, 3]
-    inst = [0, 0]
+    inst = [0, 34, 117]
     bpm = 60
 
     
@@ -22,7 +22,7 @@ def main():
     print(m.mid.length)
     #print(m.mid.tracks)
     m.tocar()
-    m.tocar()
+    #m.tocar()
     #m.salvar('doremifa.mid')
 
     return
