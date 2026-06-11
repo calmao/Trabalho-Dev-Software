@@ -1,22 +1,27 @@
 import tkinter as tk
 from tkinter import filedialog
 import musica  
+import inputLista as il
+import interpretador
+import tocarComPygame as tCP
 
 class InterfaceGrafica(tk.Tk):
     def __init__(self):
-        #construtor da superclasse Tk
+
         super().__init__()
 
-        # saidas relevantes para a main
+        # saidas relevantes para o programa
         self.saidaMIDI = musica.Musica()
         self.bpm = 100
         self.listaDeVolumes = [100 for i in range (16)]
         self.listaDeInstrumentos = [int(-1) for i in range(16)]
+        self.textoParaConverter =  " "
+        self.entradaRecebida = False
 
         #
         # widgets e configuracoes da tkinter
         #
-        self.title("Explorador de Arquivos")
+        self.title("GERADOR DE SEQUENCIAS MUSICAIS    DesSoft-2026/1")
         self.geometry("800x600")
         self.configure(bg="white")
         self.columnconfigure(0, weight=10)
@@ -24,12 +29,12 @@ class InterfaceGrafica(tk.Tk):
         self.rowconfigure(1, weight=10)
         self.vcmd = self.register(self.input_e_numero)
 
-        self.instrumentosFrame = tk.Frame(self)
-        self.instrumentosFrame.grid(row = 8,column = 1,pady = 20,sticky = "w")
         self.controlesFrame = tk.Frame(self)
         self.controlesFrame.grid(row=10,column=1)
 
-        self.label_file_explorer = tk.Label(self, text="No file selected", bg="white")
+
+        #importador de arquivo
+        self.label_file_explorer = tk.Label(self, text="Nenhum arquivo selecionado", bg="white")
         self.label_file_explorer.grid(row=0, column=0,columnspan=2, padx=10, pady=5, sticky="w")
 
         self.button_arq = tk.Button(
@@ -42,6 +47,7 @@ class InterfaceGrafica(tk.Tk):
         )
         self.button_arq.grid(row=1, column=1, sticky='sw',pady = 20)
 
+        #selecao de BPM inicial
         self.inputtxt = tk.Text(self, height = 10, width = 25, bg = "light yellow")
         self.inputtxt.grid(row=1, column=0, rowspan=10, sticky='nsew', padx=10, pady=10)
 
@@ -49,36 +55,12 @@ class InterfaceGrafica(tk.Tk):
         self.bpmLabel.grid(row=4,column=1,sticky="w")
 
         self.barrinhaBpm = tk.Entry(self,validate = "key", validatecommand=(self.vcmd, '%P'),width = 10)
-        self.barrinhaBpm.grid(row=5,column=1,sticky = "ew")
+        self.barrinhaBpm.grid(row=5,column=1,sticky = "w")
 
         self.botaoBpm = tk.Button(self,text = "confirmar BPM",command = self.muda_bpm_inicial)
         self.botaoBpm.grid(row=6,column=1,sticky = "w")
 
-#codigo duplicado para gerar lista
-###############################
-        self.instruIndice = 0
-
-        self.instrumentosLbl = tk.Label(self.instrumentosFrame,text = "Selecione intrumentos iniciais [linha][instrumento MIDI]")
-        self.instrumentosLbl.pack(side = "top")
-
-        self.instruSetaEsq = tk.Button(self.instrumentosFrame,text = "<",command = self.diminui_instuIndice)
-        self.instruSetaEsq.pack(side = "left")
-
-        self.instruIndiceIn = tk.Label(self.instrumentosFrame,text = "1")
-        self.instruIndiceIn.pack(side = "left")
-
-        self.instruSetaDir = tk.Button(self.instrumentosFrame,text = ">",command = self.aumenta_instruIndice)
-        self.instruSetaDir.pack(side = "left")
-
-        self.instruTipo = tk.Entry(self.instrumentosFrame,width =3,validate = "key", validatecommand=(self.vcmd, '%P'))
-        self.instruTipo.pack(side = "left")
-        self.instruTipo.insert(0,'')
-
-        self.instrumentoConfirma = tk.Button(self.instrumentosFrame,text = "Confirma",command = self.confirmar_instrumento)
-        self.instrumentoConfirma.pack(side ="left")
-#####################
-
-#comandos finais do usuario
+        #comandos finais do usuario
         self.confirmarEntradas = tk.Button(self.controlesFrame,text ="Ler Entrada",command = self.chama_confirmar_entradas)
         self.confirmarEntradas.pack(side = "left")
 
@@ -94,40 +76,19 @@ class InterfaceGrafica(tk.Tk):
         self.mensagemControles = tk.Label(self,text = "Em aguardo")
         self.mensagemControles.grid(row=11,column =1)
 
-#codigo duplicado pode ser transformado em classe
-#####################
-        self.listaVolumesFrame = tk.Frame(self)
-        self.listaVolumesFrame.grid(row =9,column = 1, pady = 20,sticky = "w")
+        #widgets para gerar lista de volumes e lista de instrumentos
+        self.instrumentos = il.InputDeListaDeParametros(self,"instrumentos",self.vcmd,0)
+        self.instrumentos.grid(row = 7,column = 1,sticky = "w",pady = 10)
 
-        self.volumesIndice = 0
+        self.volumes = il.InputDeListaDeParametros(self,"volumes",self.vcmd,100)
+        self.volumes.grid(row = 8,column =1,sticky = "w",pady = 10)
 
-        self.volumesLbl = tk.Label(self.listaVolumesFrame,text = "Selecionar volume de cada linha [linha][volume (1 a 127) ]")
-        self.volumesLbl.pack(side = "top")
-
-        self.listaVolumesSetaEsq = tk.Button(self.listaVolumesFrame,text = "<")
-        self.listaVolumesSetaEsq.pack(side = "left")
-
-        self.listaVolumesIn = tk.Label(self.listaVolumesFrame,text = "1")
-        self.listaVolumesIn.pack(side = "left")
-
-        self.listaVolumesSetaDir = tk.Button(self.listaVolumesFrame,text = ">")
-        self.listaVolumesSetaDir.pack(side = "left")
-
-        self.volumeDaLinha = tk.Entry(self.listaVolumesFrame,width =3,validate = "key", validatecommand=(self.vcmd, '%P'))
-        self.volumeDaLinha.pack(side="left")
-
-        self.volumeConfirma = tk.Button(self.listaVolumesFrame,text = "Confirma")
-        self.volumeConfirma.pack(side = "left")
-#####################
     
     def browseFiles(self):
         filename = filedialog.askopenfilename(initialdir = "/",
                                             title = "Select a File",
-                                            filetypes = (("Text files",
-                                                            "*.txt*"),
-                                                        ("all files",
-                                                            "*.*")))
-        self.label_file_explorer.configure(text="File Opened: "+filename)
+                                            filetypes = [('Allowed Types', '*.txt')])
+        self.label_file_explorer.configure(text="Arquivo aberto: "+filename)
         with open(filename, 'r') as file:
             content = file.read()
             self.inputtxt.delete(1.0, tk.END)
@@ -142,48 +103,60 @@ class InterfaceGrafica(tk.Tk):
     
     def muda_bpm_inicial(self):
         bpmtemp = int(self.barrinhaBpm.get())
-        if bpmtemp > 0 and bpmtemp < 401:
+        if bpmtemp >= 1 and bpmtemp <= 400:
             self.bpm = bpmtemp
             self.bpmLabel.config(text = str(f"BPM inicial :{str(self.bpm)}"))
         else:
-            self.bpmLabel.config(text = str(f"BPM inicial : erro, deve estar entre 0 e 400"))
-    
-    def diminui_instuIndice(self):
-        if self.instruIndice > 0:
-            self.instruIndice -= 1
-            self.instruIndiceIn.configure(text = str(self.instruIndice+1))
-            self.instruTipo.delete(0,"end")
-            self.instruTipo.insert(0,str(self.listaDeInstrumentos[self.instruIndice]))
-        else:
-            pass
-
-    def aumenta_instruIndice(self):
-        if  self.instruIndice < 15:
-            self.instruIndice += 1
-            self.instruIndiceIn.configure(text = str(self.instruIndice+1))
-            self.instruTipo.delete(0,"end")
-            self.instruTipo.insert(0,str(self.listaDeInstrumentos[self.instruIndice]))
-        else:
-            pass
-
-    def confirmar_instrumento(self):
-        self.listaDeInstrumentos[self.instruIndice] = int(self.instruTipo.get())
+            self.bpmLabel.config(text = str(f"BPM inicial : Erro, deve estar entre 1 e 400"))
 
     def chama_confirmar_entradas(self):
-        #self.saidaMIDI.iniciar()
+        self.textoParaConverter = self.inputtxt.get(1.0,"end-1c")
+
+        nomeDoArquivo = "arquivo_input/texto_para_converter.txt"
+        arquivoEntrada = open(nomeDoArquivo,"w")
+        arquivoEntrada.write(self.textoParaConverter)
+        arquivoEntrada.close()
+
+        self.listaDeInstrumentos = self.instrumentos.listaDeSaida
+        self.listaDeVolumes = self.volumes.listaDeSaida
+        
+        self.entradaRecebida = True
         self.mensagemControles.config(text = "Entrada de texto Recebida")
 
+        oitavas = [6,5,4,3,6,5,4,3,6,5,4,3,6,5,4,3]
+        interpretado = interpretador.Interpretador()
+        interpretado.transcrever("arquivo_input/texto_para_converter.txt",
+                                 self.bpm,self.listaDeInstrumentos,self.listaDeVolumes,
+                                 oitavas)
+        self.saidaMIDI.iniciar(interpretado)
+
     def chama_tocar(self):
-        #self.saidaMIDI.tocar()
-        self.mensagemControles.config(text = "Gerando e tocando música")
+        if(self.entradaRecebida):
+            #self.saidaMIDI.tocar()
+            self.saidaMIDI.salvar("MIDI.mid")
+            tCP.tocar_arquivoMIDI("Saidas/MIDI.mid")
+            self.mensagemControles.config(text = "Gerando e tocando música")
+        else:
+            self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
 
     def chama_pausar(self):
-        #self.saidaMIDI.parar()
-        self.mensagemControles.config(text = "Parando musica")
+        if(self.entradaRecebida):
+            self.saidaMIDI.parar()
+            self.mensagemControles.config(text = "Parando musica (não faz nada ainda)")
+        else:
+            self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
         
     def chama_gerarMIDI(self):
-        #self.saidaMIDI.salvar()
-        self.mensagemControles.config(text = "Gerando MIDI")
+        if(self.entradaRecebida):
+            self.saidaMIDI.salvar("MIDI.mid")
+            self.mensagemControles.config(text = "Gerando MIDI")
+        else:
+            self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
 
-interface = InterfaceGrafica()
-interface.mainloop()
+
+def main():
+    interface = InterfaceGrafica()
+    interface.mainloop()
+
+if __name__ == "__main__":
+    main()

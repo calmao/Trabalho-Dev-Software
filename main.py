@@ -3,12 +3,14 @@ from interpretador import Interpretador
 import sys
 import mido
 import time
+import classe_interface as ui
 
     
 def main():
-    vol = [100, 100]
-    oitava = [4, 3]
-    inst = [0, 0]
+    '''
+    vol = [100,100]
+    oitava = [4,3]
+    inst = [127,127]
     bpm = 60
 
     
@@ -19,10 +21,13 @@ def main():
 
     m = Musica()
     m.iniciar(p)
-    print(m.mid.length)
+    #print(m.mid.length)
     #print(m.mid.tracks)
-    m.tocar()
-    m.salvar('doremifa.mid')
+    #m.tocar()
+    m.salvar('doremifa.mid')'''
+
+    interface = ui.InterfaceGrafica()
+    interface.mainloop()
 
     return
 main()
