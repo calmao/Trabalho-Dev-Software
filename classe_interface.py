@@ -112,10 +112,6 @@ class InterfaceGrafica(tk.Tk):
     def chama_confirmar_entradas(self):
         self.textoParaConverter = self.inputtxt.get(1.0,"end-1c")
 
-        nomeDoArquivo = "arquivo_input/texto_para_converter.txt"
-        arquivoEntrada = open(nomeDoArquivo,"w")
-        arquivoEntrada.write(self.textoParaConverter)
-        arquivoEntrada.close()
 
         self.listaDeInstrumentos = self.instrumentos.listaDeSaida
         self.listaDeVolumes = self.volumes.listaDeSaida
@@ -123,11 +119,9 @@ class InterfaceGrafica(tk.Tk):
         self.entradaRecebida = True
         self.mensagemControles.config(text = "Entrada de texto Recebida")
 
-        oitavas = [6,5,4,3,6,5,4,3,6,5,4,3,6,5,4,3]
         interpretado = interpretador.Interpretador()
-        interpretado.transcrever("arquivo_input/texto_para_converter.txt",
-                                 self.bpm,self.listaDeInstrumentos,self.listaDeVolumes,
-                                 oitavas)
+        interpretado.transcrever(self.textoParaConverter,
+                                 self.bpm,self.listaDeInstrumentos,self.listaDeVolumes)
         self.saidaMIDI.iniciar(interpretado)
 
     def chama_tocar(self):

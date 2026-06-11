@@ -20,48 +20,47 @@ class Interpretador:
             s += '\n'
         return str(s)
 
-    def transcrever(self, nome_arquivo, bpm, inst, vol, oitava): # (str, list[float], list[int], list[int], list[int])
+    def transcrever(self, texto, bpm, inst, vol): # (str, list[float], list[int], list[int], list[int])
         if (bpm == -1):
             bpm = 100
 
-        arq = open(nome_arquivo)
-        for i in range(len(inst)):
+        oitava = []
+        linhas = texto.splitlines()
+        for i in range(len(linhas)):
             match(i%4):
                 case 0:
                     if(inst[i] == -1):
                         inst[i] = 0
                     if(vol[i] ==-1):
                         vol[i] = 100
-                    if(oitava[i] == -1):
-                        oitava[i] = 6
+                    oitava.append(6)
                 case 1:
                     if(inst[i] == -1):
                         inst[i] = 20
                     if(vol[i] ==-1):
                         vol[i] = 80
-                    if(oitava[i] == -1):
-                        oitava[i] = 5
+                    oitava.append(5)
+
                 case 2:
                     if(inst[i] == -1):
                         inst[i] = 6
                     if(vol[i] ==-1):
                         vol[i] = 60
-                    if(oitava[i] == -1):
-                        oitava[i] = 4
+                    oitava.append(4)
+
                 case 3:
                     if(inst[i] == -1):
                         inst[i] = 71
                     if(vol[i] ==-1):
                         vol[i] = 40
-                    if(oitava[i] == -1):
-                        oitava[i] = 5
+                    oitava.append(3)
+
         
-        for i in range(len(inst)):
+        for i, l in enumerate(linhas):
             ultimo_char_nota = False #verdadeiro se, e somente se, o ultimo caracter lido for uma nota
             oitava_ini = oitava[i]
 
             voz = []
-            l = arq.readline()
 
             a = 0
             if l[0] == "[":
@@ -119,4 +118,4 @@ class Interpretador:
                         
             self.partitura.append(voz)
 
-        arq.close()
+
