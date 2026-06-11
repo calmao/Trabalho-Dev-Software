@@ -3,9 +3,14 @@
 ## Download e Utilização
 	- Feito em Python 3.12.10
 	- Programa exige as bibliotecas : mido[mido-rtmidi], tkinter e pygame
-	- Para abrir a interface e utilizar o programa basta abrir um terminal no root do programa e chamar:
+	- Para abrir a interface e utilizar o programa basta abrir um terminal 
+	  no root do programa e chamar:
 		$ python3 main.py 
 
+## Download das bibliotecas em windows 
+	- caso necessario:
+	$ python3 -m pip install mido[ports-rtmidi]
+	$ pip install pygame
 
 ## Boas práticas
 	- Variaveis em snake_case
