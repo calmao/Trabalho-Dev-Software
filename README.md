@@ -1,5 +1,12 @@
 # Trabalho-Dev-Software
 
+## Download e Utilização
+	- Feito em Python 3.12.10
+	- Programa exige as bibliotecas : mido[mido-rtmidi], tkinter e pygame
+	- Para abrir a interface e utilizar o programa basta abrir um terminal no root do programa e chamar:
+		$ python3 main.py 
+
+
 ## Boas práticas
 	- Variaveis em snake_case
 
