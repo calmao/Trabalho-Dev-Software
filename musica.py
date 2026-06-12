@@ -19,19 +19,19 @@ class Musica:
         mido.set_backend('mido.backends.rtmidi')
         tempo = 0
         self.mid = MidiFile(type=1)
-        for i, voz in enumerate(trancricao.partitura):
+        for indice_voz, voz in enumerate(trancricao.partitura):
             track = MidiTrack()
-            track.append(Message('program_change', channel=i, program=voz[0].inst, time=0))
+            track.append(Message('program_change', channel=indice_voz, program=voz[0].inst, time=0))
             inst_anterior = voz[0].inst
-            for c in voz:
-                if (c.freq == '-'):
-                    tempo += cons_t/c.bpm
+            for nota in voz:
+                if (nota.freq == '-'):
+                    tempo += cons_t/nota.bpm
                 else:
-                    if(inst_anterior != c.inst):
-                        inst_anterior = c.inst
-                        track.append(Message('program_change', channel=i, program=c.inst, time=0))
-                    track.append(Message('note_on', channel=i, note=c.freq, velocity=c.vol, time=int(tempo)))
-                    track.append(Message('note_off', channel=i, note=c.freq, velocity=c.vol, time=int(cons_t/c.bpm)))
+                    if(inst_anterior != nota.inst):
+                        inst_anterior = nota.inst
+                        track.append(Message('program_change', channel=indice_voz, program=nota.inst, time=0))
+                    track.append(Message('note_on', channel=indice_voz, note=nota.freq, velocity=nota.vol, time=int(tempo)))
+                    track.append(Message('note_off', channel=indice_voz, note=nota.freq, velocity=nota.vol, time=int(cons_t/nota.bpm)))
                     tempo = 0
             self.mid.tracks.append(track)
     

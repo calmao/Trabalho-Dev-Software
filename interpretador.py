@@ -15,91 +15,90 @@ class Interpretador:
         self.partitura = []
     
 
-    def transcrever(self, texto, bpm, inst, vol): # (str, list[float], list[int], list[int], list[int])
+    def transcrever(self, texto, bpm, instrumentos, volumes): # (str, list[float], list[int], list[int], list[int])
         
         if (bpm == -1):
             bpm = 100
 
         oitava = []
         linhas = texto.splitlines()
-        for i in range(len(linhas)):
-            match(i%4):
+        for indice_voz in range(len(linhas)):
+            match(indice_voz%4):
                 case 0:
-                    if(inst[i] == -1):
-                        inst[i] = 0
-                    if(vol[i] ==-1):
-                        vol[i] = 100
+                    if(instrumentos[indice_voz] == -1):
+                        instrumentos[indice_voz] = 0
+                    if(volumes[indice_voz] ==-1):
+                        volumes[indice_voz] = 100
                     oitava.append(6)
                 case 1:
-                    if(inst[i] == -1):
-                        inst[i] = 20
-                    if(vol[i] ==-1):
-                        vol[i] = 80
+                    if(instrumentos[indice_voz] == -1):
+                        instrumentos[indice_voz] = 20
+                    if(volumes[indice_voz] ==-1):
+                        volumes[indice_voz] = 80
                     oitava.append(5)
 
                 case 2:
-                    if(inst[i] == -1):
-                        inst[i] = 6
-                    if(vol[i] ==-1):
-                        vol[i] = 60
+                    if(instrumentos[indice_voz] == -1):
+                        instrumentos[indice_voz] = 6
+                    if(volumes[indice_voz] ==-1):
+                        volumes[indice_voz] = 60
                     oitava.append(4)
 
                 case 3:
-                    if(inst[i] == -1):
-                        inst[i] = 71
-                    if(vol[i] ==-1):
-                        vol[i] = 40
+                    if(instrumentos[indice_voz] == -1):
+                        instrumentos[indice_voz] = 71
+                    if(volumes[indice_voz] ==-1):
+                        volumes[indice_voz] = 40
                     oitava.append(3)
 
         
-        for i, l in enumerate(linhas):
+        for indice_voz, linha in enumerate(linhas):
             ultimo_char_nota = False #verdadeiro se, e somente se, o ultimo caracter lido for uma nota
-            oitava_ini = oitava[i]
+            oitava_ini = oitava[indice_voz]
 
             voz = []
 
-            a = 0
-            if l[0] == "[":
-                a = int(l[1:l.rfind("]")])
-                for i in range(a):
-                    voz.append(Nota("-", bpm, vol[i], inst[i]))
+            delay_voz = 0
+            if linha[0] == "[":
+                delay_voz = int(linha[1:linha.rfind("]")])
+                for indice_voz in range(delay_voz):
+                    voz.append(Nota("-", bpm, volumes[indice_voz], instrumentos[indice_voz]))
             
-            for j in range(a, len(l)):
-                match l[j]: #primeiro switch/case case trata de ações, se cair no default entra no switch/case de notas
+            for indice_char in range(delay_voz, len(linha)):
+                match linha[indice_char]: #primeiro switch/case case trata de ações, se cair no default entra no switch/case de notas
                     
                     case "!":
-                        inst[i] = 24
+                        instrumentos[indice_voz] = 24
                         ultimo_char_nota = False
                     case "I" | "i" | "O" | "o" | "U" | "u":
-                        inst[i] = 110
+                        instrumentos[indice_voz] = 110
                         ultimo_char_nota = False
                     case ";" | "1" | "3" | "5" | "7" | "9":
-                        inst[i] = 15
+                        instrumentos[indice_voz] = 15
                         ultimo_char_nota = False
                     case "0":
-                        inst[i] = inst[i]
                         ultimo_char_nota = False
                     case "2":
-                        inst[i] = inst[i] + 2
+                        instrumentos[indice_voz] = instrumentos[indice_voz] + 2
                         ultimo_char_nota = False
                     case "4":
-                        inst[i] = inst[i] + 4
+                        instrumentos[indice_voz] = instrumentos[indice_voz] + 4
                         ultimo_char_nota = False
                     case "6":
-                        inst[i] = inst[i] + 6
+                        instrumentos[indice_voz] = instrumentos[indice_voz] + 6
                         ultimo_char_nota = False
                     case "8":
-                        inst[i] = inst[i] + 8
+                        instrumentos[indice_voz] = instrumentos[indice_voz] + 8
                         ultimo_char_nota = False
                     case "?":
-                        oitava[i] += 1
-                        if oitava[i] ==10:
-                            oitava[i]= oitava_ini
+                        oitava[indice_voz] += 1
+                        if oitava[indice_voz] ==10:
+                            oitava[indice_voz]= oitava_ini
                         ultimo_char_nota = False
                     case "V":
-                        oitava[i] -= 1
-                        if oitava[i] == -2:
-                            oitava[i]= oitava_ini
+                        oitava[indice_voz] -= 1
+                        if oitava[indice_voz] == -2:
+                            oitava[indice_voz]= oitava_ini
                         ultimo_char_nota = False
                     case ">":
                         bpm += 10
@@ -108,41 +107,41 @@ class Interpretador:
                         bpm -= 10
                         ultimo_char_nota = False
                     case " ":
-                        vol[i] = 2*vol[i]
-                        if vol[i] > 127:
-                            vol[i] = 127
+                        volumes[indice_voz] = 2*volumes[indice_voz]
+                        if volumes[indice_voz] > 127:
+                            volumes[indice_voz] = 127
                         ultimo_char_nota = False
                     case 'C':
-                        voz.append(Nota((oitava[i]+1)*12, bpm, vol[i], inst[i]))
+                        voz.append(Nota((oitava[indice_voz]+1)*12, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                         ultimo_char_nota = True
                     case 'D':
-                        voz.append(Nota(((oitava[i]+1)*12)+2, bpm, vol[i], inst[i]))
+                        voz.append(Nota(((oitava[indice_voz]+1)*12)+2, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                         ultimo_char_nota = True
                     case 'M':
-                        voz.append(Nota(((oitava[i]+1)*12)+3, bpm, vol[i], inst[i]))
+                        voz.append(Nota(((oitava[indice_voz]+1)*12)+3, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                         ultimo_char_nota = True
                     case 'E':
-                        voz.append(Nota(((oitava[i]+1)*12)+4, bpm, vol[i], inst[i]))
+                        voz.append(Nota(((oitava[indice_voz]+1)*12)+4, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                         ultimo_char_nota = True
                     case 'F':
-                        voz.append(Nota(((oitava[i]+1)*12)+5, bpm, vol[i], inst[i]))
+                        voz.append(Nota(((oitava[indice_voz]+1)*12)+5, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                         ultimo_char_nota = True
                     case 'G':
-                        voz.append(Nota(((oitava[i]+1)*12)+7, bpm, vol[i], inst[i]))
+                        voz.append(Nota(((oitava[indice_voz]+1)*12)+7, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                         ultimo_char_nota = True
                     case 'A':
-                        voz.append(Nota(((oitava[i]+1)*12)+9, bpm, vol[i], inst[i]))
+                        voz.append(Nota(((oitava[indice_voz]+1)*12)+9, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                         ultimo_char_nota = True
                     case 'H':
-                        voz.append(Nota(((oitava[i]+1)*12)+10, bpm, vol[i], inst[i]))
+                        voz.append(Nota(((oitava[indice_voz]+1)*12)+10, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                         ultimo_char_nota = True
                     case 'B':
-                        voz.append(Nota(((oitava[i]+1)*12)+11, bpm, vol[i], inst[i]))
+                        voz.append(Nota(((oitava[indice_voz]+1)*12)+11, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                         ultimo_char_nota = True
                     case _:
-                        if (ord(l[j]) > 96 and ord(l[j]) < 105):
-                            if(l[j] != "b" or l[j-1] != "M"):
-                                voz.append(Nota("-", bpm, vol[i], inst[i]))
+                        if (ord(linha[indice_char]) > 96 and ord(linha[indice_char]) < 105):
+                            if(linha[indice_char] != "b" or linha[indice_char-1] != "M"):
+                                voz.append(Nota("-", bpm, volumes[indice_voz], instrumentos[indice_voz]))
                                 ultimo_char_nota = False
                         elif ultimo_char_nota:
                             voz.append(voz[-1])
