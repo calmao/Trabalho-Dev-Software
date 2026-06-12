@@ -30,28 +30,8 @@ class Musica:
                     if(inst_anterior != c.inst):
                         inst_anterior = c.inst
                         track.append(Message('program_change', channel=i, program=c.inst, time=0))
-                    nota = (int(c.freq[1]) + 1)*12
-                    match(c.freq[0]):
-                        case 'C':
-                            nota += 0
-                        case 'D':
-                            nota += 2
-                        case 'M':
-                            nota += 3
-                        case 'E':
-                            nota += 4
-                        case 'F':
-                            nota += 5
-                        case 'G':
-                            nota += 7
-                        case 'A':
-                            nota += 9
-                        case 'H':
-                            nota += 10
-                        case 'B':
-                            nota += 11
-                    track.append(Message('note_on', channel=i, note=nota, velocity=c.vol, time=int(tempo)))
-                    track.append(Message('note_off', channel=i, note=nota, velocity=c.vol, time=int(cons_t/c.bpm)))
+                    track.append(Message('note_on', channel=i, note=c.freq, velocity=c.vol, time=int(tempo)))
+                    track.append(Message('note_off', channel=i, note=c.freq, velocity=c.vol, time=int(cons_t/c.bpm)))
                     tempo = 0
             self.mid.tracks.append(track)
     

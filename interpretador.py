@@ -1,3 +1,5 @@
+import mido
+
 class Nota:
     def __init__(self, freq:str, bpm, vol:int, inst:int):
         self.freq = freq
@@ -12,15 +14,9 @@ class Interpretador:
     def __init__(self):
         self.partitura = []
     
-    def __str__(self):
-        s = ''
-        for i in self.partitura:
-            for j in i:
-                s += j.freq
-            s += '\n'
-        return str(s)
 
     def transcrever(self, texto, bpm, inst, vol): # (str, list[float], list[int], list[int], list[int])
+        
         if (bpm == -1):
             bpm = 100
 
@@ -104,15 +100,37 @@ class Interpretador:
                         vol[i] = 2*vol[i]
                         if vol[i] > 127:
                             vol[i] = 127
+                    case 'C':
+                        voz.append(Nota((oitava[i]+1)*12, bpm, vol[i], inst[i]))
+                        ultimo_char_nota = True
+                    case 'D':
+                        voz.append(Nota(((oitava[i]+1)*12)+2, bpm, vol[i], inst[i]))
+                        ultimo_char_nota = True
+                    case 'M':
+                        voz.append(Nota(((oitava[i]+1)*12)+3, bpm, vol[i], inst[i]))
+                        ultimo_char_nota = True
+                    case 'E':
+                        voz.append(Nota(((oitava[i]+1)*12)+4, bpm, vol[i], inst[i]))
+                        ultimo_char_nota = True
+                    case 'F':
+                        voz.append(Nota(((oitava[i]+1)*12)+5, bpm, vol[i], inst[i]))
+                        ultimo_char_nota = True
+                    case 'G':
+                        voz.append(Nota(((oitava[i]+1)*12)+7, bpm, vol[i], inst[i]))
+                        ultimo_char_nota = True
+                    case 'A':
+                        voz.append(Nota(((oitava[i]+1)*12)+9, bpm, vol[i], inst[i]))
+                        ultimo_char_nota = True
+                    case 'H':
+                        voz.append(Nota(((oitava[i]+1)*12)+10, bpm, vol[i], inst[i]))
+                        ultimo_char_nota = True
+                    case 'B':
+                        voz.append(Nota(((oitava[i]+1)*12)+11, bpm, vol[i], inst[i]))
+                        ultimo_char_nota = True
                     case _:
-                        if (ord(l[j]) > 64 and ord(l[j]) < 73):
-                            voz.append(Nota(f"{l[j]}{oitava[i]}", bpm, vol[i], inst[i]))
-                            ultimo_char_nota = True
-                        elif (ord(l[j]) > 96 and ord(l[j]) < 105):
+                        if (ord(l[j]) > 96 and ord(l[j]) < 105):
                             if(l[j] != "b" or l[j-1] != "M"):
                                 voz.append(Nota("-", bpm, vol[i], inst[i]))
-                        elif l[j] == "M":
-                            voz.append(Nota("M"+str(oitava[i]), bpm, vol[i], inst[i]))
                         elif ultimo_char_nota:
                             voz.append(voz[-1])
                         
