@@ -3,7 +3,6 @@ from tkinter import filedialog
 import musica  
 import inputLista as il
 import interpretador
-import tocarComPygame as tCP
 
 class InterfaceGrafica(tk.Tk):
     def __init__(self):
@@ -16,7 +15,7 @@ class InterfaceGrafica(tk.Tk):
         self.listaDeVolumes = [100 for i in range (16)]
         self.listaDeInstrumentos = [int(-1) for i in range(16)]
         self.textoParaConverter =  " "
-        self.entradaRecebida = False
+        self.midiGerado = False
 
         #
         # widgets e configuracoes da tkinter
@@ -61,26 +60,20 @@ class InterfaceGrafica(tk.Tk):
         self.botaoBpm.grid(row=6,column=1,sticky = "w")
 
         #comandos finais do usuario
-        self.confirmarEntradas = tk.Button(self.controlesFrame,text ="Ler Entrada",command = self.chama_confirmar_entradas)
-        self.confirmarEntradas.pack(side = "left")
+        self.botaoGerarMIDI = tk.Button(self.controlesFrame,text = "Gerar MIDI",command = self.chama_gerarMIDI)
+        self.botaoGerarMIDI.pack(side = "left")
 
         self.botaoTocar = tk.Button(self.controlesFrame,text = "Tocar",command = self.chama_tocar)
         self.botaoTocar.pack(side = "left")
-
-        self.botaoPausar = tk.Button(self.controlesFrame,text = "Pausar",command = self.chama_pausar)
-        self.botaoPausar.pack(side="left")
-
-        self.botaoGerarMIDI = tk.Button(self.controlesFrame,text = "Gerar MIDI",command = self.chama_gerarMIDI)
-        self.botaoGerarMIDI.pack(side = "left")
 
         self.mensagemControles = tk.Label(self,text = "Em aguardo")
         self.mensagemControles.grid(row=11,column =1)
 
         #widgets para gerar lista de volumes e lista de instrumentos
-        self.instrumentos = il.InputDeListaDeParametros(self,"instrumentos",self.vcmd,0)
+        self.instrumentos = il.ListaDeParametros(self,"instrumentos",self.vcmd,0)
         self.instrumentos.grid(row = 7,column = 1,sticky = "w",pady = 10)
 
-        self.volumes = il.InputDeListaDeParametros(self,"volumes",self.vcmd,100)
+        self.volumes = il.ListaDeParametros(self,"volumes",self.vcmd,100)
         self.volumes.grid(row = 8,column =1,sticky = "w",pady = 10)
 
     
@@ -109,43 +102,32 @@ class InterfaceGrafica(tk.Tk):
         else:
             self.bpmLabel.config(text = str(f"BPM inicial : Erro, deve estar entre 1 e 400"))
 
-    def chama_confirmar_entradas(self):
-        self.textoParaConverter = self.inputtxt.get(1.0,"end-1c")
-
-
-        self.listaDeInstrumentos = self.instrumentos.listaDeSaida
-        self.listaDeVolumes = self.volumes.listaDeSaida
-        
-        self.entradaRecebida = True
-        self.mensagemControles.config(text = "Entrada de texto Recebida")
-
-        interpretado = interpretador.Interpretador()
-        interpretado.transcrever(self.textoParaConverter,
-                                 self.bpm,self.listaDeInstrumentos,self.listaDeVolumes)
-        self.saidaMIDI.iniciar(interpretado)
-
     def chama_tocar(self):
-        if(self.entradaRecebida):
-            #self.saidaMIDI.tocar()
-            self.saidaMIDI.salvar("MIDI.mid")
-            tCP.tocar_arquivoMIDI("Saidas/MIDI.mid")
-            self.mensagemControles.config(text = "Gerando e tocando música")
+        if self.midiGerado:
+            self.saidaMIDI.tocar_arquivoMIDI("Saidas/MIDI.mid")
         else:
-            self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
-
-    def chama_pausar(self):
-        if(self.entradaRecebida):
-            self.saidaMIDI.parar()
-            self.mensagemControles.config(text = "Parando musica (não faz nada ainda)")
-        else:
-            self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
+            self.mensagemControles.config(text = "Erro: nenhum midi foi gerado")
         
     def chama_gerarMIDI(self):
-        if(self.entradaRecebida):
-            self.saidaMIDI.salvar("MIDI.mid")
-            self.mensagemControles.config(text = "Gerando MIDI")
+            
+        self.textoParaConverter = self.inputtxt.get(1.0,"end-1c")
+    
+        numeroDeLinhas = self.textoParaConverter.count('\n') + 1
+
+        if numeroDeLinhas <= 16 :
+            self.listaDeInstrumentos = self.instrumentos.listaDeSaida
+            self.listaDeVolumes = self.volumes.listaDeSaida
+
+            interpretado = interpretador.Interpretador()
+            interpretado.transcrever(self.textoParaConverter,
+                                    self.bpm,self.listaDeInstrumentos,self.listaDeVolumes)
+            self.saidaMIDI.iniciar(interpretado)  
+
+            self.saidaMIDI.salvar("MIDI.mid") 
+            self.mensagemControles.config(text = "Gerando MIDI") 
+            self.midiGerado = True
         else:
-            self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
+            self.mensagemControles.config(text = "Erro: o numero maximo de linhas é 16")
 
 
 def main():
