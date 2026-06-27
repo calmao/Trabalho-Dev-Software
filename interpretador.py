@@ -15,41 +15,13 @@ class Interpretador:
         self.partitura = []
     
 
-    def transcrever(self, texto, bpm, instrumentos, volumes): # (str, list[float], list[int], list[int], list[int])
+    def transcrever(self, texto:str, bpm, instrumentos, volumes): # (str, list[float], list[int], list[int], list[int])
         
         if (bpm == -1):
             bpm = 100
 
-        oitava = []
         linhas = texto.splitlines()
-        for indice_voz in range(len(linhas)):
-            match(indice_voz%4):
-                case 0:
-                    if(instrumentos[indice_voz] == -1):
-                        instrumentos[indice_voz] = 0
-                    if(volumes[indice_voz] ==-1):
-                        volumes[indice_voz] = 100
-                    oitava.append(6)
-                case 1:
-                    if(instrumentos[indice_voz] == -1):
-                        instrumentos[indice_voz] = 20
-                    if(volumes[indice_voz] ==-1):
-                        volumes[indice_voz] = 80
-                    oitava.append(5)
-
-                case 2:
-                    if(instrumentos[indice_voz] == -1):
-                        instrumentos[indice_voz] = 6
-                    if(volumes[indice_voz] ==-1):
-                        volumes[indice_voz] = 60
-                    oitava.append(4)
-
-                case 3:
-                    if(instrumentos[indice_voz] == -1):
-                        instrumentos[indice_voz] = 71
-                    if(volumes[indice_voz] ==-1):
-                        volumes[indice_voz] = 40
-                    oitava.append(3)
+        oitava,instrumentos,volumes = self.iniciar_parametros(linhas,instrumentos,volumes)
 
         
         for indice_voz, linha in enumerate(linhas):
@@ -148,5 +120,46 @@ class Interpretador:
                             ultimo_char_nota = False
                         
             self.partitura.append(voz)
+    
+    def iniciar_parametros(self,linhas,instrumentos,volumes):
+        oitava = []
+        for indice_voz in range(len(linhas)):
+            match(indice_voz%4):
+                case 0:
+                    if( self.valor_invalido(instrumentos[indice_voz]) ):
+                        instrumentos[indice_voz] = 0
+                    if( self.valor_invalido (volumes[indice_voz]) ):
+                        volumes[indice_voz] = 100
+                    oitava.append(6)
+                case 1:
+                    if( self.valor_invalido(instrumentos[indice_voz]) ):
+                        instrumentos[indice_voz] = 20
+                    if( self.valor_invalido (volumes[indice_voz]) ):
+                        volumes[indice_voz] = 80
+                    oitava.append(5)
 
+                case 2:
+                    if( self.valor_invalido(instrumentos[indice_voz]) ):
+                        instrumentos[indice_voz] = 6
+                    if( self.valor_invalido(volumes[indice_voz]) ):
+                        volumes[indice_voz] = 60
+                    oitava.append(4)
+
+                case 3:
+                    if( self.valor_invalido(instrumentos[indice_voz]) ):
+                        instrumentos[indice_voz] = 71
+                    if( self.valor_invalido (volumes[indice_voz]) ):
+                        volumes[indice_voz] = 40
+                    oitava.append(3)
+
+        return oitava,instrumentos,volumes
+
+    def valor_invalido(self,valor):
+
+        if not(valor >=0 or valor <= 127):
+            invalido = True
+        else:
+            invalido = False
+
+        return invalido
 

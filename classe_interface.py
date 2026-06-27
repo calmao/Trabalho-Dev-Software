@@ -14,7 +14,6 @@ class InterfaceGrafica(tk.Tk):
         self.bpm = 100
         self.listaDeVolumes = [100 for i in range (16)]
         self.listaDeInstrumentos = [int(-1) for i in range(16)]
-        self.textoParaConverter =  " "
         self.midiGerado = False
 
         #
@@ -110,16 +109,16 @@ class InterfaceGrafica(tk.Tk):
         
     def chama_gerarMIDI(self):
             
-        self.textoParaConverter = self.inputtxt.get(1.0,"end-1c")
+        textoParaConverter = self.inputtxt.get(1.0,"end-1c")
     
-        numeroDeLinhas = self.textoParaConverter.count('\n') + 1
+        numeroDeLinhas = textoParaConverter.count('\n') + 1
 
         if numeroDeLinhas <= 16 :
             self.listaDeInstrumentos = self.instrumentos.listaDeSaida
             self.listaDeVolumes = self.volumes.listaDeSaida
 
             interpretado = interpretador.Interpretador()
-            interpretado.transcrever(self.textoParaConverter,
+            interpretado.transcrever(textoParaConverter,
                                     self.bpm,self.listaDeInstrumentos,self.listaDeVolumes)
             self.saidaMIDI.iniciar(interpretado)  
 
