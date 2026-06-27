@@ -120,11 +120,13 @@ class InterfaceGrafica(tk.Tk):
             interpretado = interpretador.Interpretador()
             interpretado.transcrever(textoParaConverter,
                                     self.bpm,self.listaDeInstrumentos,self.listaDeVolumes)
-            self.saidaMIDI.iniciar(interpretado)  
-
-            self.saidaMIDI.salvar("MIDI.mid") 
-            self.mensagemControles.config(text = "Gerando MIDI") 
-            self.midiGerado = True
+            try:
+                self.saidaMIDI.iniciar(interpretado)  
+                self.saidaMIDI.salvar("MIDI.mid") 
+                self.midiGerado = True
+                self.mensagemControles.config(text = "Gerando MIDI")
+            except:
+                self.mensagemControles.config(text = "Erro: não foi possivel gerar novo MIDI")
         else:
             self.mensagemControles.config(text = "Erro: o numero maximo de linhas é 16")
 
