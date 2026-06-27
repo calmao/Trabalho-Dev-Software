@@ -78,10 +78,10 @@ class InterfaceGrafica(tk.Tk):
         self.mensagemControles.grid(row=11,column =1)
 
         #widgets para gerar lista de volumes e lista de instrumentos
-        self.instrumentos = il.InputDeListaDeParametros(self,"instrumentos",self.vcmd,0)
+        self.instrumentos = il.ListaDeParametros(self,"instrumentos",self.vcmd,0)
         self.instrumentos.grid(row = 7,column = 1,sticky = "w",pady = 10)
 
-        self.volumes = il.InputDeListaDeParametros(self,"volumes",self.vcmd,100)
+        self.volumes = il.ListaDeParametros(self,"volumes",self.vcmd,100)
         self.volumes.grid(row = 8,column =1,sticky = "w",pady = 10)
 
     
