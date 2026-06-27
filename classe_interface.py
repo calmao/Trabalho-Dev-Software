@@ -152,9 +152,29 @@ class InterfaceGrafica(tk.Tk):
             self.mensagemControles.config(text = "Música pausada")
         
     def chama_gerarMIDI(self):
+<<<<<<< HEAD
         if(self.entradaRecebida):
             self.saidaMIDI.salvar("MIDI.mid")
             self.mensagemControles.config(text = "Gerando MIDI")
+=======
+            
+        textoParaConverter = self.inputtxt.get(1.0,"end-1c")
+    
+        numeroDeLinhas = textoParaConverter.count('\n') + 1
+
+        if numeroDeLinhas <= 16 :
+            self.listaDeInstrumentos = self.instrumentos.listaDeSaida
+            self.listaDeVolumes = self.volumes.listaDeSaida
+
+            interpretado = interpretador.Interpretador()
+            interpretado.transcrever(textoParaConverter,
+                                    self.bpm,self.listaDeInstrumentos,self.listaDeVolumes)
+            self.saidaMIDI.iniciar(interpretado)  
+
+            self.saidaMIDI.salvar("MIDI.mid") 
+            self.mensagemControles.config(text = "Gerando MIDI") 
+            self.midiGerado = True
+>>>>>>> parent of 6190b69 (novos testes basicos, bug na oitava corrigido)
         else:
             self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
 
