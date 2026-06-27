@@ -3,7 +3,6 @@ from tkinter import filedialog
 import musica  
 import inputLista as il
 import interpretador
-import tocarComPygame as tCP
 
 class InterfaceGrafica(tk.Tk):
     def __init__(self):
@@ -15,9 +14,7 @@ class InterfaceGrafica(tk.Tk):
         self.bpm = 100
         self.listaDeVolumes = [100 for i in range (16)]
         self.listaDeInstrumentos = [int(-1) for i in range(16)]
-        self.textoParaConverter =  " "
-        self.entradaRecebida = False
-        self.musicaPausada = False
+        self.midiGerado = False
 
         #
         # widgets e configuracoes da tkinter
@@ -58,21 +55,15 @@ class InterfaceGrafica(tk.Tk):
         self.barrinhaBpm = tk.Entry(self,validate = "key", validatecommand=(self.vcmd, '%P'),width = 10)
         self.barrinhaBpm.grid(row=5,column=1,sticky = "w")
 
-        self.botaoBpm = tk.Button(self,text = "Confirmar BPM",command = self.muda_bpm_inicial)
+        self.botaoBpm = tk.Button(self,text = "confirmar BPM",command = self.muda_bpm_inicial)
         self.botaoBpm.grid(row=6,column=1,sticky = "w")
 
         #comandos finais do usuario
-        self.confirmarEntradas = tk.Button(self.controlesFrame,text ="Ler Entrada",command = self.chama_confirmar_entradas)
-        self.confirmarEntradas.pack(side = "left")
+        self.botaoGerarMIDI = tk.Button(self.controlesFrame,text = "Gerar MIDI",command = self.chama_gerarMIDI)
+        self.botaoGerarMIDI.pack(side = "left")
 
         self.botaoTocar = tk.Button(self.controlesFrame,text = "Tocar",command = self.chama_tocar)
         self.botaoTocar.pack(side = "left")
-
-        self.botaoPausar = tk.Button(self.controlesFrame,text = "Pausar",command = self.chama_pausar)
-        self.botaoPausar.pack(side="left")
-
-        self.botaoGerarMIDI = tk.Button(self.controlesFrame,text = "Gerar MIDI",command = self.chama_gerarMIDI)
-        self.botaoGerarMIDI.pack(side = "left")
 
         self.mensagemControles = tk.Label(self,text = "Em aguardo")
         self.mensagemControles.grid(row=11,column =1)
@@ -110,53 +101,13 @@ class InterfaceGrafica(tk.Tk):
         else:
             self.bpmLabel.config(text = str(f"BPM inicial : Erro, deve estar entre 1 e 400"))
 
-    def chama_confirmar_entradas(self):
-        self.textoParaConverter = self.inputtxt.get(1.0,"end-1c")
-
-
-        self.listaDeInstrumentos = self.instrumentos.listaDeSaida
-        self.listaDeVolumes = self.volumes.listaDeSaida
-        
-        self.entradaRecebida = True
-        self.mensagemControles.config(text = "Entrada de texto Recebida")
-
-        interpretado = interpretador.Interpretador()
-        interpretado.transcrever(self.textoParaConverter,
-                                 self.bpm,self.listaDeInstrumentos,self.listaDeVolumes)
-        self.saidaMIDI.iniciar(interpretado)
-
     def chama_tocar(self):
-        if(self.entradaRecebida):
-            self.saidaMIDI.salvar("MIDI.mid")
-            tCP.tocar_arquivoMIDI("Saidas/MIDI.mid")
-            self.musicaPausada = False
-            self.botaoPausar.config(text="Pausar")
-            self.mensagemControles.config(text = "Gerando e tocando música")
+        if self.midiGerado:
+            self.saidaMIDI.tocar_arquivoMIDI("Saidas/MIDI.mid")
         else:
-            self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
-
-    def chama_pausar(self):
-        if not self.entradaRecebida:
-            self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
-            return
-
-        if self.musicaPausada:
-            tCP.despausar_arquivoMIDI()
-            self.musicaPausada = False
-            self.botaoPausar.config(text="Pausar")
-            self.mensagemControles.config(text = "Continuando música")
-        else:
-            tCP.pausar_arquivoMIDI()
-            self.musicaPausada = True
-            self.botaoPausar.config(text="Continuar")
-            self.mensagemControles.config(text = "Música pausada")
+            self.mensagemControles.config(text = "Erro: nenhum midi foi gerado")
         
     def chama_gerarMIDI(self):
-<<<<<<< HEAD
-        if(self.entradaRecebida):
-            self.saidaMIDI.salvar("MIDI.mid")
-            self.mensagemControles.config(text = "Gerando MIDI")
-=======
             
         textoParaConverter = self.inputtxt.get(1.0,"end-1c")
     
@@ -169,14 +120,15 @@ class InterfaceGrafica(tk.Tk):
             interpretado = interpretador.Interpretador()
             interpretado.transcrever(textoParaConverter,
                                     self.bpm,self.listaDeInstrumentos,self.listaDeVolumes)
-            self.saidaMIDI.iniciar(interpretado)  
-
-            self.saidaMIDI.salvar("MIDI.mid") 
-            self.mensagemControles.config(text = "Gerando MIDI") 
-            self.midiGerado = True
->>>>>>> parent of 6190b69 (novos testes basicos, bug na oitava corrigido)
+            try:
+                self.saidaMIDI.iniciar(interpretado)  
+                self.saidaMIDI.salvar("MIDI.mid") 
+                self.midiGerado = True
+                self.mensagemControles.config(text = "Gerando MIDI")
+            except:
+                self.mensagemControles.config(text = "Erro: não foi possivel gerar novo MIDI")
         else:
-            self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
+            self.mensagemControles.config(text = "Erro: o numero maximo de linhas é 16")
 
 
 def main():

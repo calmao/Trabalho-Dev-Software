@@ -64,7 +64,7 @@ class Interpretador:
                         ultimo_char_nota = False
                     case "?":
                         oitava[indice_voz] += 1
-                        if oitava[indice_voz] ==10:
+                        if oitava[indice_voz] == 9 :
                             oitava[indice_voz]= oitava_ini
                         ultimo_char_nota = False
                     case "V":

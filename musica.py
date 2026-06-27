@@ -52,6 +52,14 @@ class Musica:
         self.tocando = False
 
     def salvar(self, nome):
-        self.mid.save('Saidas/' + (nome))
+        self.mid.save('Saidas/' + nome)
+
+    def tocar_arquivoMIDI(self,nomeDoMidi):
+        pygame.init()
+        pygame.mixer.music.load(nomeDoMidi)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            pygame.time.wait(1000)
+    
             
 
