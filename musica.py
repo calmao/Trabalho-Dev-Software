@@ -51,6 +51,6 @@ class Musica:
         self.tocando = False
 
     def salvar(self, nome):
-        self.mid.save('Saidas/' + nome)
+        self.mid.save('Saidas/' + (nome))
             
 

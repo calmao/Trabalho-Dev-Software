@@ -17,6 +17,7 @@ class InterfaceGrafica(tk.Tk):
         self.listaDeInstrumentos = [int(-1) for i in range(16)]
         self.textoParaConverter =  " "
         self.entradaRecebida = False
+        self.musicaPausada = False
 
         #
         # widgets e configuracoes da tkinter
@@ -57,7 +58,7 @@ class InterfaceGrafica(tk.Tk):
         self.barrinhaBpm = tk.Entry(self,validate = "key", validatecommand=(self.vcmd, '%P'),width = 10)
         self.barrinhaBpm.grid(row=5,column=1,sticky = "w")
 
-        self.botaoBpm = tk.Button(self,text = "confirmar BPM",command = self.muda_bpm_inicial)
+        self.botaoBpm = tk.Button(self,text = "Confirmar BPM",command = self.muda_bpm_inicial)
         self.botaoBpm.grid(row=6,column=1,sticky = "w")
 
         #comandos finais do usuario
@@ -126,19 +127,29 @@ class InterfaceGrafica(tk.Tk):
 
     def chama_tocar(self):
         if(self.entradaRecebida):
-            #self.saidaMIDI.tocar()
             self.saidaMIDI.salvar("MIDI.mid")
             tCP.tocar_arquivoMIDI("Saidas/MIDI.mid")
+            self.musicaPausada = False
+            self.botaoPausar.config(text="Pausar")
             self.mensagemControles.config(text = "Gerando e tocando música")
         else:
             self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
 
     def chama_pausar(self):
-        if(self.entradaRecebida):
-            self.saidaMIDI.parar()
-            self.mensagemControles.config(text = "Parando musica (não faz nada ainda)")
-        else:
+        if not self.entradaRecebida:
             self.mensagemControles.config(text = "Erro: nenhuma entrada confirmada")
+            return
+
+        if self.musicaPausada:
+            tCP.despausar_arquivoMIDI()
+            self.musicaPausada = False
+            self.botaoPausar.config(text="Pausar")
+            self.mensagemControles.config(text = "Continuando música")
+        else:
+            tCP.pausar_arquivoMIDI()
+            self.musicaPausada = True
+            self.botaoPausar.config(text="Continuar")
+            self.mensagemControles.config(text = "Música pausada")
         
     def chama_gerarMIDI(self):
         if(self.entradaRecebida):
