@@ -1,6 +1,6 @@
 import tkinter as tk
 
-class InputDeListaDeParametros(tk.Frame):
+class ListaDeParametros(tk.Frame):
     def __init__(self,parent,inputTypeName,vcmd,valorPadrao):
         super().__init__(parent)
 
