@@ -24,7 +24,7 @@ class Musica:
             track.append(Message('program_change', channel=indice_voz, program=voz[0].inst, time=0))
             inst_anterior = voz[0].inst
             for nota in voz:
-                if (nota.freq == '-'):
+                if (nota.freq == -1):
                     tempo += cons_t/nota.bpm
                 else:
                     if(inst_anterior != nota.inst):

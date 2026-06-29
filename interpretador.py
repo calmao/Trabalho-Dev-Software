@@ -13,6 +13,17 @@ class Nota:
 class Interpretador:
     def __init__(self):
         self.partitura = []
+
+    def __str__(self):
+        s = ""
+        for n in self.partitura:
+            for i in n:
+                s = s+str(i)
+                s = s+", " 
+        s = s+"\n"
+        return s
+
+
     
 
     def transcrever(self, texto, bpm, instrumentos, volumes): # (str, list[float], list[int], list[int], list[int])
@@ -61,11 +72,11 @@ class Interpretador:
             delay_voz = 0
             if linha[0] == "[":
                 delay_voz = int(linha[1:linha.rfind("]")])
-                for indice_voz in range(delay_voz):
-                    voz.append(Nota("-", bpm, volumes[indice_voz], instrumentos[indice_voz]))
+                for _ in range(delay_voz):
+                    voz.append(Nota(-1, bpm, volumes[indice_voz], instrumentos[indice_voz]))
             
-            for indice_char in range(delay_voz, len(linha)):
-                match linha[indice_char]: #primeiro switch/case case trata de ações, se cair no default entra no switch/case de notas
+            for indice_char in range(max(0, linha.rfind("]")), len(linha)):
+                match linha[indice_char]:
                     
                     case "!":
                         instrumentos[indice_voz] = 24
@@ -92,7 +103,7 @@ class Interpretador:
                         ultimo_char_nota = False
                     case "?":
                         oitava[indice_voz] += 1
-                        if oitava[indice_voz] ==10:
+                        if oitava[indice_voz] ==9:
                             oitava[indice_voz]= oitava_ini
                         ultimo_char_nota = False
                     case "V":
@@ -141,12 +152,10 @@ class Interpretador:
                     case _:
                         if (ord(linha[indice_char]) > 96 and ord(linha[indice_char]) < 105):
                             if(linha[indice_char] != "b" or linha[indice_char-1] != "M"):
-                                voz.append(Nota("-", bpm, volumes[indice_voz], instrumentos[indice_voz]))
+                                voz.append(Nota(-1, bpm, volumes[indice_voz], instrumentos[indice_voz]))
                                 ultimo_char_nota = False
                         elif ultimo_char_nota:
                             voz.append(voz[-1])
                             ultimo_char_nota = False
                         
             self.partitura.append(voz)
-
-
