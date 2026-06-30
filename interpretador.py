@@ -75,11 +75,7 @@ class Interpretador:
                         ultimo_char_nota = False
                     case "?":
                         oitava[indice_voz] += 1
-<<<<<<< HEAD
                         if oitava[indice_voz] ==9:
-=======
-                        if oitava[indice_voz] == 9 :
->>>>>>> 06a71ed3aa3550ae3dcdbae5f280ef52f226f8b4
                             oitava[indice_voz]= oitava_ini
                         ultimo_char_nota = False
                     case "V":
@@ -134,9 +130,6 @@ class Interpretador:
                             voz.append(voz[-1])
                             ultimo_char_nota = False
                         
-<<<<<<< HEAD
-            self.partitura.append(voz)
-=======
             self.partitura.append(voz)
     
     def iniciar_parametros(self,linhas,instrumentos,volumes):
@@ -181,4 +174,3 @@ class Interpretador:
 
         return invalido
 
->>>>>>> 06a71ed3aa3550ae3dcdbae5f280ef52f226f8b4
